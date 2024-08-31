@@ -9,15 +9,15 @@ draft = false
 This article is fruit of a bunch of notes I took in the last months while I read and watched everything I could put my hands on regarding indexes. I wanted to write about them because I wanted to make sure I got a good grasp of the theme, and it covers just the bare minimum knowledge of indexes a backend developer should know. If you want an in-depth discussion about indexes I suggest you to look at this amazing database agnostic [resource put up by Markus Winand](https://use-the-index-luke.com/), or this [series of blog posts](https://postgrespro.com/blog/pgsql/3994098) by Egor Egorov. [PostgresFM](https://www.youtube.com/@PostgresTV) podcast also has lots of materials about indexes and everything Postgres. Of course there's also a lot of useful information in the [official docs](https://www.postgresql.org/docs/16/indexes.html).  
 
 ## Basics
-Indexes are special database objects primarily designed to increase the speed of data access, by allowing the database to read less data from the disk. They can also be used to enforce constraints like primary keys, unique keys and exclusion. Indexes are important for performance but do not speedup a query unless the query matches the columns and data types in the index. Also, as a very rough rule of thumb, an index will only help if less than 15-20% of the table will be returned in he query, otherwise the query planner might prefer a sequential scan. If your query returns a large percentage of the table, consider refactoring it, using summary tables or other techniques before throwing an index at the problem. It's also good to keep in mind that the whole indexed column is copied in every node of the index, since there's a limit in node size capacity, the larger the indexed column the deeper the tree will be. With that in mind, let's give a closer look at how Postgres stores your data in the disk and how indexes help to speedup querying this data.
+Indexes are special database objects primarily designed to increase the speed of data access, by allowing the database to read less data from the disk. They can also be used to enforce constraints like primary keys, unique keys and exclusion. Indexes are important for performance but do not speedup a query unless the query matches the columns and data types in the index. Also, as a very rough rule of thumb, an index will only help if less than 15-20% of the table will be returned in he query, otherwise the query planner might prefer a sequential scan. If your query returns a large percentage of the table, consider refactoring it, using summary tables or other techniques before throwing an index at the problem. It's also good to keep in mind that the whole indexed column is copied in every node of the btree, since there's a limit in node size capacity, the larger the indexed column the deeper the tree will be. With that in mind, let's give a closer look at how Postgres stores your data in the disk and how indexes help to speedup querying this data.
 
 There are six types of indexes available in the default postgres installation and more types available through extensions. Typically, they work by associating a key value with a data location in one or more rows of the table containing that key. Each line is identified by a TID, or tuple id.
 
 ### How data is stored in disk
-To understand indexes, it is important to first understand how postgres stores table data on disk. Every table in postgres has one (or more) corresponding file(s) on disk (depends on the size of the table). All table rows (internally referred to as "tuples") are saved in this file and do not have a specific order. This file is also called heap and is divided into 8kb pages.
+To understand indexes, it is important to first understand how postgres stores table data on disk. Every table in postgres has one (or more) corresponding file(s) on disk (depends on the size of the table). All table rows, internally referred to as "tuples", are saved in this file and do not have a specific order. This file is also called heap and is divided into 8kb pages.
 
 
-The pg_class table is an internal PostgreSQL table (catalog) that contains table data. We can find the heap file of a table using the following SQL commands:
+The pg_class table is an internal PostgreSQL table that contains table metadata. We can find the heap file of a table using the following SQL commands:
 
 {{< highlight sql >}}
 create table foo (id int, name text);
@@ -35,11 +35,11 @@ create table foo (id int, name text);
 {{< highlight sql >}}
 select oid, datname
 from pg_database
-where datname = 'postgres_for_developers';                                                                                
+where datname = 'my_database';                                                                                
 
   oid  |         datname        
 -------+-------------------------
- 71122 | postgres_for_developers
+ 71122 | my_database
 (1 row)
 
 {{< / highlight >}}
@@ -79,7 +79,7 @@ INSERT 0 1
 {{< / highlight >}}
 
 
-We can add the `ctid` field to the query to retrieve the ctid of each line. The ctid is an internal field that has the address of the line in the heap and is composed of a tuple in the format (m, n) where m is the block id and n is the tuple offset. "ctid" stands for "current tuple id".
+We can add the `ctid` field to the query to retrieve the ctid of each line. The ctid is an internal field that has the address of the line in the heap and is composed of a tuple in the format (m, n) where m is the block id and n is the tuple offset. "ctid" stands for "current tuple id". Here you can note that the row with id one is stored in the page 0, offset 1. 
 
 {{< highlight sql >}}
 select ctid, * from foo;
@@ -97,50 +97,56 @@ Let's add more players to the table so that the total rows is one million:
 
 
 {{< highlight sql >}}
-insert into foo (id, name)
+insert into foo (id, name);
 select generate_series(3, 1000000), 'Player ' || generate_series(3, 1000000);
 {{< / highlight >}}
 
+After adding more rows to the table its corresponding file is not 30MB. Internally, it is divided into 8kb pages.
 
-When we do a postgres search on a table without an index, postgres will read all tuples in every page and apply a filter. For example, let's analyze the command below that searches for rows whose `name` column value is equal to "Ronaldo" and show how the database performed this search.
-
-
-[use explain with analyze buffers]
-{{< highlight sql >}}
-explain analyze select * from foo where name = 'Ronaldo';                                                                                                      
-                                                    QUERY PLAN                                                    
--------------------------------------------------------------------------------------------------------------------
- Gather  (cost=1000.00..12577.43 rows=1 width=18) (actual time=0.322..50.455 rows=1 loops=1)
-   Workers Planned: 2
-   Workers Launched: 2
-   ->  Parallel Seq Scan on foo  (cost=0.00..11577.33 rows=1 width=18) (actual time=24.872..40.984 rows=0 loops=3)
-         Filter: (name = 'Ronaldo'::text)
-         Rows Removed by Filter: 333333
- Planning Time: 0.344 ms
- Execution Time: 50.484 ms
+{{< highlight bash >}}
+ls -lrtah /opt/homebrew/var/postgresql@16/base/71122/71123
+-rw-------  1 dlt  admin    30M 16 Aug 16:32 /opt/homebrew/var/postgresql@16/base/71122/71133
 {{< / highlight >}}
 
-Note the in output the line starting with " -> Parallel Seq scan on foo". This line denotes that the database performed a sequential search and read all the rows in the table. The execution time for this query was 50.484ms.
+When we do a postgres search on a table without an index, postgres will read all tuples in every page and apply a filter. For example, let's analyze the command below that searches for rows whose `name` column value is equal to "Ronaldo" and show how the database performed this search. We use the explain command with the options `(analyse, buffers)`. `analyse` will actually execute the query instead of just using cost estimates, and `buffers` will show buffer reads.
+
+{{< highlight sql >}}
+ explain (analyze, buffers) select * from foo where name = 'Ronaldo';
+                                                     QUERY PLAN
+---------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=1000.00..12577.43 rows=1 width=18) (actual time=0.307..264.991 rows=1 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   Buffers: shared hit=97 read=6272
+   ->  Parallel Seq Scan on foo  (cost=0.00..11577.33 rows=1 width=18) (actual time=169.520..256.639 rows=0 loops=3)
+         Filter: (name = 'Ronaldo'::text)
+         Rows Removed by Filter: 333333
+         Buffers: shared hit=97 read=6272
+ Planning Time: 0.143 ms
+ Execution Time: 265.021 ms
+{{< / highlight >}}
+
+Note the in output the line starting with " -> Parallel Seq scan on foo". This line denotes that the database performed a sequential search and read all the rows in the table. The execution time for this query was 265.021ms. Also note the line that says "Buffers: shared hit=97 read=6272". This mean that we needed to read 97 pages from memory, and 6272 pages from disk.
 
 Now let's add an index on the name colum and see how the same query performs. We're using the command `create index concurrently` because we don't want to block the table for writes.
-
 
 {{< highlight sql >}}
 create index concurrently on foo(name);
 CREATE INDEX
 
-explain analyze select * from foo where name = 'Ronaldo';
-                                                    QUERY PLAN                                                    
+explain (analyze, buffers) select * from foo where name = 'Ronaldo';
+                                                    QUERY PLAN
 -------------------------------------------------------------------------------------------------------------------
- Index Scan using foo_name_idx on foo  (cost=0.42..8.44 rows=1 width=18) (actual time=0.041..0.043 rows=1 loops=1)
+ Index Scan using foo_name_idx on foo  (cost=0.42..8.44 rows=1 width=18) (actual time=0.047..0.049 rows=1 loops=1)
    Index Cond: (name = 'Ronaldo'::text)
- Planning Time: 1.840 ms
- Execution Time: 0.074 ms
-(4 rows)
+   Buffers: shared hit=4
+ Planning Time: 0.129 ms
+ Execution Time: 0.077 ms
+(5 rows)
 {{< / highlight >}}
 
 
-Here we see that the index was used and that in this case the execution time was reduced from 50.484 to 0.074 milliseconds!
+Here we see that the index was used and that in this case the execution time was reduced from 264.21 to 0.074 milliseconds, and the database only needed to read 4 pages!
 The reduction in execution time happens because, now, instead of reading all the rows in the table, the database uses the index. The index is a tree structure mapping the value "Ronaldo" to the ctid(s) of the rows that have this value in the `name` column (in our example we only have one such row). The ctid is then used to quickly locate these rows on the heap.
 
 ## Costs associated with indexes
