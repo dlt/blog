@@ -90,11 +90,8 @@ select ctid, * from foo;
 (2 rows)
 {{< / highlight >}}
 
-
-
 ### How indexes speedup access to data
 Let's add more players to the table so that the total rows is one million:
-
 
 {{< highlight sql >}}
 insert into foo (id, name);
@@ -149,6 +146,18 @@ explain (analyze, buffers) select * from foo where name = 'Ronaldo';
 Here we see that the index was used and that in this case the execution time was reduced from 264.21 to 0.074 milliseconds, and the database only needed to read 4 pages!
 The reduction in execution time happens because, now, instead of reading all the rows in the table, the database uses the index. The index is a tree structure mapping the value "Ronaldo" to the ctid(s) of the rows that have this value in the `name` column (in our example we only have one such row). The ctid is then used to quickly locate these rows on the heap.
 
+If we use `\di+` to show the indexes in our database we can see that the index we've created occupies `30MB`, roughly the same size as the `foo` table.
+
+{{< highlight sql >}}
+\di+
+
+                                         List of relations
+ Schema |     Name     | Type  | Owner | Table | Persistence | Access method | Size  | Description
+--------+--------------+-------+-------+-------+-------------+---------------+-------+-------------
+ public | foo_name_idx | index | dlt   | foo   | permanent   | btree         | 30 MB |
+(1 row)
+
+{{< / highlight >}}
 ## Costs associated with indexes
 
 It is important to highlight that the extra speed brought by indices is associated with several costs that must be considered when deciding where and how to apply them.
