@@ -16,12 +16,7 @@ There are six types of indexes available in the default postgres installation an
 ### How data is stored in disk
 To understand indexes, it is important to first understand how postgres stores table data on disk. Every table in postgres has one (or more) corresponding file(s) on disk (depends on the size of the table). All table rows, internally referred to as "tuples", are saved in this file and do not have a specific order. This file is also called heap and is divided into 8kb pages.
 
-
-The pg_class table is an internal PostgreSQL table that contains table metadata. We can find the heap file of a table using the following SQL commands:
-
-{{< highlight sql >}}
-create table foo (id int, name text);
-{{< / highlight >}}
+We can enter psql and use `show data_directory` to show the directory Postgres uses to store databases physical files.
 
 {{< highlight sql >}}
  show data_directory;
@@ -29,10 +24,14 @@ create table foo (id int, name text);
          data_directory          
 ---------------------------------
  /opt/homebrew/var/postgresql@16
-
 {{< / highlight >}}
 
+Now we can use the internal `pg_class` to find the file where the heap a table is stored:
+
 {{< highlight sql >}}
+create table foo (id int, name text);
+
+
 select oid, datname
 from pg_database
 where datname = 'my_database';                                                                                
@@ -41,7 +40,6 @@ where datname = 'my_database';                                 �
 -------+-------------------------
  71122 | my_database
 (1 row)
-
 {{< / highlight >}}
 
 {{< highlight sql >}}
@@ -49,7 +47,6 @@ select relfilenode from pg_class where relname = 'foo';                 
  relfilenode
 -------------
        71123
-
 {{< / highlight >}}
 
 Then we can check the file on disk by running this command in the shell (ls $PGDATA/base/<database_oid>/<table_oid>):
@@ -94,14 +91,14 @@ insert into foo (id, name);
 select generate_series(3, 1000000), 'Player ' || generate_series(3, 1000000);
 {{< / highlight >}}
 
-After adding more rows to the table its corresponding file is not 30MB. Internally, it is divided into 8kb pages.
+After adding more rows to the table its corresponding file is 30MB. Internally, it is divided into 8kb pages.
 
 {{< highlight bash >}}
 ls -lrtah /opt/homebrew/var/postgresql@16/base/71122/71123
 -rw-------  1 dlt  admin    30M 16 Aug 16:32 /opt/homebrew/var/postgresql@16/base/71122/71133
 {{< / highlight >}}
 
-When we do a postgres search on a table without an index, postgres will read all tuples in every page and apply a filter. For example, let's analyze the command below that searches for rows whose `name` column value is equal to "Ronaldo" and show how the database performed this search. We use the explain command with the options `(analyse, buffers)`. `analyse` will actually execute the query instead of just using cost estimates, and `buffers` will show buffer reads.
+When we query a table without an index, Postgres reads all tuples in every page and apply a filter. For example, let's analyze the command below that searches for rows whose `name` column value is equal to "Ronaldo" and show how the database performed this search. We use the explain command with the options `(analyse, buffers)`. `analyse` will actually execute the query instead of just using cost estimates, and `buffers` will show buffer reads.
 
 {{< highlight sql >}}
  explain (analyze, buffers) select * from foo where name = 'Ronaldo';
