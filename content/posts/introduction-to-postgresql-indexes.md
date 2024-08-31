@@ -46,10 +46,6 @@ where datname = 'my_database';                                 �
 
 {{< highlight sql >}}
 select relfilenode from pg_class where relname = 'foo';                                                                                                  
-{{< / highlight >}}
-
-
-{{< highlight bash >}}
  relfilenode
 -------------
        71123
