@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Introduction to PostgreSQL Indexes | </title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="description" content="TLDR; This article is fruit of a bunch of notes I took in the last months while I read and watched everything I could put my hands on regarding indexes. I wanted to write about them because I wanted to make sure I got a good grasp of the theme, and it covers just the bare minimum knowledge of indexes a backend developer should know. If you want an in-depth discussion about indexes I suggest you to look at this amazing database agnostic resource put up by Markus Winand, or this series of blog posts by Egor Egorov.">
+    <meta name="generator" content="Hugo 0.132.1">
+    
+    
+    
+    
+      <meta name="robots" content="noindex, nofollow">
+    
+    
+
+    
+<link rel="stylesheet" href="/ananke/css/main.min.css" >
+
+
+
+    
+
+    
+      
+
+    
+
+    
+
+    
+      <link rel="canonical" href="http://localhost:1313/posts/introduction-to-postgresql-indexes/">
+    
+
+    <meta property="og:url" content="http://localhost:1313/posts/introduction-to-postgresql-indexes/">
+  <meta property="og:title" content="Introduction to PostgreSQL Indexes">
+  <meta property="og:description" content="TLDR; This article is fruit of a bunch of notes I took in the last months while I read and watched everything I could put my hands on regarding indexes. I wanted to write about them because I wanted to make sure I got a good grasp of the theme, and it covers just the bare minimum knowledge of indexes a backend developer should know. If you want an in-depth discussion about indexes I suggest you to look at this amazing database agnostic resource put up by Markus Winand, or this series of blog posts by Egor Egorov.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-17T18:38:51+04:00">
+    <meta property="article:modified_time" content="2024-08-17T18:38:51+04:00">
+
+  <meta itemprop="name" content="Introduction to PostgreSQL Indexes">
+  <meta itemprop="description" content="TLDR; This article is fruit of a bunch of notes I took in the last months while I read and watched everything I could put my hands on regarding indexes. I wanted to write about them because I wanted to make sure I got a good grasp of the theme, and it covers just the bare minimum knowledge of indexes a backend developer should know. If you want an in-depth discussion about indexes I suggest you to look at this amazing database agnostic resource put up by Markus Winand, or this series of blog posts by Egor Egorov.">
+  <meta itemprop="datePublished" content="2024-08-17T18:38:51+04:00">
+  <meta itemprop="dateModified" content="2024-08-17T18:38:51+04:00">
+  <meta itemprop="wordCount" content="3575">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Introduction to PostgreSQL Indexes">
+  <meta name="twitter:description" content="TLDR; This article is fruit of a bunch of notes I took in the last months while I read and watched everything I could put my hands on regarding indexes. I wanted to write about them because I wanted to make sure I got a good grasp of the theme, and it covers just the bare minimum knowledge of indexes a backend developer should know. If you want an in-depth discussion about indexes I suggest you to look at this amazing database agnostic resource put up by Markus Winand, or this series of blog posts by Egor Egorov.">
+
+	
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l justify-between items-center center">
+    <a href="/" class="f3 fw2 hover-white no-underline white-90 dib">
+      
+        
+      
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      
+<div class="ananke-socials">
+  
+</div>
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  <article class="flex-l flex-wrap justify-between mw8 center ph3">
+    <header class="mt4 w-100">
+      <aside class="instapaper_ignoref b helvetica tracked ttu">
+          
+        Posts
+      </aside>
+      
+
+
+
+
+
+
+
+
+
+
+  <div id="sharing" class="mt3 ananke-socials">
+    
+  </div>
+
+
+      <h1 class="f1 athelas mt3 mb1">Introduction to PostgreSQL Indexes</h1>
+      
+      
+      
+      <time class="f6 mv4 dib tracked" datetime="2024-08-17T18:38:51+04:00">August 17, 2024</time>
+      
+
+      
+      
+    </header>
+    <div class="nested-copy-line-height lh-copy serif f4 nested-links mid-gray pr4-l w-two-thirds-l"><h2 id="tldr">TLDR;</h2>
+<p>This article is fruit of a bunch of notes I took in the last months while I read and watched everything I could put my hands on regarding indexes. I wanted to write about them because I wanted to make sure I got a good grasp of the theme, and it covers just the bare minimum knowledge of indexes a backend developer should know. If you want an in-depth discussion about indexes I suggest you to look at this amazing database agnostic <a href="https://use-the-index-luke.com/">resource put up by Markus Winand</a>, or this <a href="https://postgrespro.com/blog/pgsql/3994098">series of blog posts</a> by Egor Egorov. <a href="https://www.youtube.com/@PostgresTV">PostgresFM</a> podcast also has lots of materials about indexes and everything Postgres. Of course there&rsquo;s also a lot of useful information in the <a href="https://www.postgresql.org/docs/16/indexes.html">official docs</a>.</p>
+<h2 id="basics">Basics</h2>
+<p>Indexes are special database objects primarily designed to increase the speed of data access, by allowing the database to read less data from the disk. They can also be used to enforce constraints like primary keys, unique keys and exclusion. Indexes are important for performance but do not speedup a query unless the query matches the columns and data types in the index. Also, as a very rough rule of thumb, an index will only help if less than 15-20% of the table will be returned in he query, otherwise the query planner might prefer a sequential scan. If your query returns a large percentage of the table, consider refactoring it, using summary tables or other techniques before throwing an index at the problem. It&rsquo;s also good to keep in mind that the whole indexed column is copied in every node of the index, since there&rsquo;s a limit in node size capacity, the larger the indexed column the deeper the tree will be. With that in mind, let&rsquo;s give a closer look at how Postgres stores your data in the disk and how indexes help to speedup querying this data.</p>
+<p>There are six types of indexes available in the default postgres installation and more types available through extensions. Typically, they work by associating a key value with a data location in one or more rows of the table containing that key. Each line is identified by a TID, or tuple id.</p>
+<h3 id="how-data-is-stored-in-disk">How data is stored in disk</h3>
+<p>To understand indexes, it is important to first understand how postgres stores table data on disk. Every table in postgres has one (or more) corresponding file(s) on disk (depends on the size of the table). All table rows (internally referred to as &ldquo;tuples&rdquo;) are saved in this file and do not have a specific order. This file is also called heap and is divided into 8kb pages.</p>
+<p>The pg_class table is an internal PostgreSQL table (catalog) that contains table data. We can find the heap file of a table using the following SQL commands:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">create</span> <span style="color:#66d9ef">table</span> foo (id int, name text);</span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span> <span style="color:#66d9ef">show</span> data_directory;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>         data_directory          
+</span></span><span style="display:flex;"><span><span style="color:#75715e">---------------------------------
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> <span style="color:#f92672">/</span>opt<span style="color:#f92672">/</span>homebrew<span style="color:#f92672">/</span>var<span style="color:#f92672">/</span>postgresql<span style="color:#f92672">@</span><span style="color:#ae81ff">16</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">select</span> oid, datname
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">from</span> pg_database
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">where</span> datname <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;postgres_for_developers&#39;</span>;                                                                                
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  oid  <span style="color:#f92672">|</span>         datname        
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-------+-------------------------
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> <span style="color:#ae81ff">71122</span> <span style="color:#f92672">|</span> postgres_for_developers
+</span></span><span style="display:flex;"><span>(<span style="color:#ae81ff">1</span> <span style="color:#66d9ef">row</span>)</span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">select</span> relfilenode <span style="color:#66d9ef">from</span> pg_class <span style="color:#66d9ef">where</span> relname <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;foo&#39;</span>;                                                                                                  </span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span> relfilenode
+</span></span><span style="display:flex;"><span>-------------
+</span></span><span style="display:flex;"><span>       <span style="color:#ae81ff">71123</span></span></span></code></pre></div>
+<p>Then we can check the file on disk by running this command in the shell (ls $PGDATA/base/&lt;database_oid&gt;/&lt;table_oid&gt;):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ls -lrt /opt/homebrew/var/postgresql@16/base/71122/71123
+</span></span><span style="display:flex;"><span>-rw-------  <span style="color:#ae81ff">1</span> dlt  admin  <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">16</span> Aug 14:20 /opt/homebrew/var/postgresql@16/base/71122/71123</span></span></code></pre></div>
+<p>The file has size 0 because we haven&rsquo;t done any INSERTs in this table yet.</p>
+<p>Let&rsquo;s add a couple of rows to our table:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">insert</span> <span style="color:#66d9ef">into</span> foo (id, name) <span style="color:#66d9ef">values</span> (<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#39;Ronaldo&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">insert</span> <span style="color:#66d9ef">into</span> foo (id, name) <span style="color:#66d9ef">values</span> (<span style="color:#ae81ff">2</span>, <span style="color:#e6db74">&#39;Romario&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">1</span></span></span></code></pre></div>
+<p>We can add the <code>ctid</code> field to the query to retrieve the ctid of each line. The ctid is an internal field that has the address of the line in the heap and is composed of a tuple in the format (m, n) where m is the block id and n is the tuple offset. &ldquo;ctid&rdquo; stands for &ldquo;current tuple id&rdquo;.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">select</span> ctid, <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> foo;
+</span></span><span style="display:flex;"><span> ctid  <span style="color:#f92672">|</span> id <span style="color:#f92672">|</span>  name   
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-------+----+---------
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> (<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">1</span>) <span style="color:#f92672">|</span>  <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span> Ronaldo
+</span></span><span style="display:flex;"><span> (<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">2</span>) <span style="color:#f92672">|</span>  <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> Romario
+</span></span><span style="display:flex;"><span>(<span style="color:#ae81ff">2</span> <span style="color:#66d9ef">rows</span>)</span></span></code></pre></div>
+<h3 id="how-indexes-speedup-access-to-data">How indexes speedup access to data</h3>
+<p>Let&rsquo;s add more players to the table so that the total rows is one million:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">insert</span> <span style="color:#66d9ef">into</span> foo (id, name)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">select</span> generate_series(<span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">1000000</span>), <span style="color:#e6db74">&#39;Player &#39;</span> <span style="color:#f92672">||</span> generate_series(<span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">1000000</span>);</span></span></code></pre></div>
+<p>When we do a postgres search on a table without an index, postgres will read all tuples in every page and apply a filter. For example, let&rsquo;s analyze the command below that searches for rows whose <code>name</code> column value is equal to &ldquo;Ronaldo&rdquo; and show how the database performed this search.</p>
+<p>[use explain with analyze buffers]
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">explain</span> <span style="color:#66d9ef">analyze</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> foo <span style="color:#66d9ef">where</span> name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Ronaldo&#39;</span>;                                                                                                      
+</span></span><span style="display:flex;"><span>                                                    QUERY PLAN                                                    
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-------------------------------------------------------------------------------------------------------------------
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> Gather  (cost<span style="color:#f92672">=</span><span style="color:#ae81ff">1000</span>.<span style="color:#ae81ff">00</span>..<span style="color:#ae81ff">12577</span>.<span style="color:#ae81ff">43</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> width<span style="color:#f92672">=</span><span style="color:#ae81ff">18</span>) (actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">322</span>..<span style="color:#ae81ff">50</span>.<span style="color:#ae81ff">455</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>   Workers Planned: <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>   Workers Launched: <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#f92672">-&gt;</span>  Parallel Seq Scan <span style="color:#66d9ef">on</span> foo  (cost<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span>..<span style="color:#ae81ff">11577</span>.<span style="color:#ae81ff">33</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> width<span style="color:#f92672">=</span><span style="color:#ae81ff">18</span>) (actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">24</span>.<span style="color:#ae81ff">872</span>..<span style="color:#ae81ff">40</span>.<span style="color:#ae81ff">984</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>         Filter: (name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Ronaldo&#39;</span>::text)
+</span></span><span style="display:flex;"><span>         <span style="color:#66d9ef">Rows</span> Removed <span style="color:#66d9ef">by</span> Filter: <span style="color:#ae81ff">333333</span>
+</span></span><span style="display:flex;"><span> Planning Time: <span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">344</span> ms
+</span></span><span style="display:flex;"><span> Execution Time: <span style="color:#ae81ff">50</span>.<span style="color:#ae81ff">484</span> ms</span></span></code></pre></div></p>
+<p>Note the in output the line starting with &quot; -&gt; Parallel Seq scan on foo&quot;. This line denotes that the database performed a sequential search and read all the rows in the table. The execution time for this query was 50.484ms.</p>
+<p>Now let&rsquo;s add an index on the name colum and see how the same query performs. We&rsquo;re using the command <code>create index concurrently</code> because we don&rsquo;t want to block the table for writes.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">create</span> <span style="color:#66d9ef">index</span> concurrently <span style="color:#66d9ef">on</span> foo(name);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">INDEX</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">explain</span> <span style="color:#66d9ef">analyze</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> foo <span style="color:#66d9ef">where</span> name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Ronaldo&#39;</span>;
+</span></span><span style="display:flex;"><span>                                                    QUERY PLAN                                                    
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-------------------------------------------------------------------------------------------------------------------
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> <span style="color:#66d9ef">Index</span> Scan <span style="color:#66d9ef">using</span> foo_name_idx <span style="color:#66d9ef">on</span> foo  (cost<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">42</span>..<span style="color:#ae81ff">8</span>.<span style="color:#ae81ff">44</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> width<span style="color:#f92672">=</span><span style="color:#ae81ff">18</span>) (actual time<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">041</span>..<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">043</span> <span style="color:#66d9ef">rows</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> loops<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">Index</span> Cond: (name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Ronaldo&#39;</span>::text)
+</span></span><span style="display:flex;"><span> Planning Time: <span style="color:#ae81ff">1</span>.<span style="color:#ae81ff">840</span> ms
+</span></span><span style="display:flex;"><span> Execution Time: <span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">074</span> ms
+</span></span><span style="display:flex;"><span>(<span style="color:#ae81ff">4</span> <span style="color:#66d9ef">rows</span>)</span></span></code></pre></div>
+<p>Here we see that the index was used and that in this case the execution time was reduced from 50.484 to 0.074 milliseconds!
+The reduction in execution time happens because, now, instead of reading all the rows in the table, the database uses the index. The index is a tree structure mapping the value &ldquo;Ronaldo&rdquo; to the ctid(s) of the rows that have this value in the <code>name</code> column (in our example we only have one such row). The ctid is then used to quickly locate these rows on the heap.</p>
+<h2 id="costs-associated-with-indexes">Costs associated with indexes</h2>
+<p>It is important to highlight that the extra speed brought by indices is associated with several costs that must be considered when deciding where and how to apply them.</p>
+<h3 id="disk-space">Disk Space</h3>
+<p>Indexes are stored in a separate area of the heap and take up additional disk space. The more indexes a table has, the greater the amount of disk space required to store them. This incurs in additional storage costs for your table and for backups, increased replication traffic, and increased backup and failover recovery times. Bear in mind that its not uncommon for btree indexes to be larger than the database itself. Learnign about partial indexes, and multicolumn indexes, as well as about other more space efficient index types such as BRIN can be helpful.</p>
+<h3 id="write-operations">Write operations</h3>
+<p>Also, there is a maintenance cost in writing operations such as UPDATE, INSERT and DELETE, if a field that is part of an index is modified, as the corresponding index needs to be updated, which can add significant overhead to the writing process. [show graph with number of indexes and write overhead upon updates]</p>
+<h3 id="query-planner">Query planner</h3>
+<p>The presence of indexes increases the complexity of the query planner&rsquo;s work, which is the component responsible for determining the best execution strategy for a query. With more indexes available, the query planner has more options to consider, which can increase the time needed to plan the query, especially in systems with many complex queries or where there are many indexes available. [show graph with relationship between number of indexes and planning time].</p>
+<h3 id="memory-usage">Memory usage</h3>
+<p>PostgreSQL maintains a portion of ferquently accessed data and index pages in memory via shared buffers. When an index is used, the relevant index pages are loaded into shared buffers to speed up access. The more indexes you have and the more they are used, the more shared buffer memory is necessary. Since shared buffers are limited and are also used for caching data pages, filling the shared buffers with indexes can lead to less efficient caching of table data. Another aspect of memory usage is that PostgreSQL uses work memory when it executes queries that involves sorting or complex index scans (involving multi-column or covering indexes). Larger indexes require more memory for these operations. Also, indexes require memory to store some metadata about their structure, column names and statistics in the system catalog cache. The more indexes you have and the more complex and bigger they are, more memory is required. And finally indexes require memory for maintainance operations like vacuuming and reindexing operations.</p>
+<h2 id="types-of-indexes">Types of Indexes</h2>
+<h3 id="btree">Btree</h3>
+<p>The B-Tree is a very powerful algorithim from 1972. It is a common data structure not only in Postgres but in almost every database management system, since it is a very good general purpose index. It was invented by Rudolf Bayer and Edward M.McCreight while working at Boeing. Nobody really knows if the &ldquo;B&rdquo; in B-tree stands for Bayer, Boeing, balanced or better, and it doesn&rsquo;t really matter. What matters is that it enables us to search elements in the tree in O(log n) time. If you&rsquo;re not familiar with Big-O notation, all you need to know is that is is really fast - you only need to make 20 comparisons in order to find an element in a set with 1 million items. This means that the database will avoid lots of disk page accesses to find the desired data.  In PostgreSQL the btree is the most common type of index and its the default, it&rsquo;s also used to support system and TOAST indexes. Even an empty database has hundreds of btree indexes. It is the only index type that can be used for primary and unique key constraints.</p>
+<p>In contrast with a binary tree, the BTree is a balanced tree and all of its leave nodes have the same distance from the root. The root nodes and inner nodes have pointers to lower levels, and the leaf nodes have the keys and pointers to the heap. Postgres btrees also have pointers to the left and right nodes for easier forward and backward scanning. Nodes can have multiple keys and these keys are sorted so that it&rsquo;s easy to walk in ordered directions and to perform ORDER BY and JOIN operations. The values are only stored in the leaf nodes, this makes the tree more compact and facilitates a full traversal of the objects in a tree with just a linear pass through all the leaf nodes. This is just a simplified description of PostgreSQL Btree indexes, if you want to get into the low level details, I suggest you to read the README and the paper that inspired them.
+Below there&rsquo;s a simplified illustration of a Postgres Btree.</p>
+<p><img src="/images/postgres_btree.png" alt="postgres btree"></p>
+<h4 id="using-multiple-indexes">Using multiple indexes</h4>
+<p>Postgres can use multiple indexes to handle cases that cannot be handled by single index scans, by forming <code>AND</code> and <code>OR</code> conditions across several index scans with the support of bitmaps. The bitmaps are ANDed or ORed together as needed by the query and finally the table rows are visited and returned. Let&rsquo;s say we have a query like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> users <span style="color:#66d9ef">where</span> age <span style="color:#f92672">=</span> <span style="color:#ae81ff">30</span> <span style="color:#66d9ef">and</span> login_count <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>;</span></span></code></pre></div>
+<p>If the <code>age</code> and <code>login_count</code> columns are indexed, postgres scans index <code>age</code> for all pages with <code>age=30</code> and makes a bitmap where the pages that might contain rows with <code>age=30</code> are true. In a similar way, it builds a bitmap using the <code>login_count</code> index. It then ANDs the two bitmaps to form a third bitmap, and performs a table scan, only reading the pages that might contain candidate values, and only adding the rows where <code>age=30 and login_count=100</code> to the result set.</p>
+<h4 id="multi-column-indexes">Multi-column indexes</h4>
+<p>Multi-column indexes are an alternative for using multiple indexes. They&rsquo;re generaly going to be smaller and faster than using multiple indexes, but they&rsquo;ll also be less flexible. That&rsquo;s because the order of the columns matter, because the database can search for a subset of the indexed columns, as long as they are the leftmost columns. For example, if you have an index on column <code>a</code> and another index on column <code>b</code>, these indexes will serve all the of queries above:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> my_table <span style="color:#66d9ef">where</span> a <span style="color:#f92672">=</span> <span style="color:#ae81ff">42</span> <span style="color:#66d9ef">and</span> b <span style="color:#f92672">=</span> <span style="color:#ae81ff">420</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> my_table <span style="color:#66d9ef">where</span> a <span style="color:#f92672">=</span> <span style="color:#ae81ff">43</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> my_table <span style="color:#66d9ef">where</span> b <span style="color:#f92672">=</span> <span style="color:#ae81ff">99</span>;</span></span></code></pre></div>
+<p>On the other hand, only the first two queries would use an index if you created a multi-column index on (a, b) with a command like <code>create index on my_table(a, b)</code>; So, when building multi-column indexes choose the order of the columns well so that your index can be used by the most queries possible.</p>
+<h4 id="partial-indexes">Partial indexes</h4>
+<p>Partial indexes allow you to use a conditional expression to control what subset of rows will be indexed, so that your index can be smaller and more likely to fit in RAM. They&rsquo;re mostly useful in situations where you don&rsquo;t care about some rows, or when you&rsquo;re indexing on a column where the proportion of one value is much greater than others. I&rsquo;ll give two examples below.</p>
+<h5 id="when-you-dont-care-about-some-rows">When you don&rsquo;t care about some rows</h5>
+<p>Let&rsquo;s say you have a rules table where the rows can be marked as enabled/disabled, the vast majority of the rows are disabled and in your queries you only care about enabled rows. In this case, you would have a partial index, filtering out the disable rows like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">create</span> <span style="color:#66d9ef">index</span> <span style="color:#66d9ef">on</span> rules(status) <span style="color:#66d9ef">where</span> status <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;enabled&#39;</span>;</span></span></code></pre></div>
+<h5 id="when-the-distribution-of-values-is-skewed">When the distribution of values is skewed</h5>
+<p>Now imagine you&rsquo;re building a todo application and the status column value can be either <code>TODO</code>, <code>DOING</code>, and <code>DONE</code>. Suppose you have 1M rows and this is the current distribution of rows in each status:</p>
+<table>
+<thead>
+<tr>
+<th>Rows</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TODO</td>
+<td>90%</td>
+</tr>
+<tr>
+<td>DOING</td>
+<td>5%</td>
+</tr>
+<tr>
+<td>DONE</td>
+<td>5%</td>
+</tr>
+</tbody>
+</table>
+<p>Since postgres keeps statistics about the distribution of values in your table columns and knows that the vast majority of the rows are in the <code>TODO</code> status, it would choose to do a sequential scan on the <code>tasks</code> table when you have <code>status='TODO'</code> in the <code>WHERE</code> clause of your query, even if you have an index on status, leaving most part of the index unused and wasting space. In this case, a partial scan such as the one below is recommended:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">create</span> <span style="color:#66d9ef">index</span> <span style="color:#66d9ef">on</span> tasks(status) <span style="color:#66d9ef">where</span> status <span style="color:#f92672">&lt;&gt;</span> <span style="color:#e6db74">&#39;TODO&#39;</span>;</span></span></code></pre></div>
+<h4 id="covering-indexes">Covering indexes</h4>
+<p>If you have a query that selects only columns in an index, postgres has all information needed by the query in the index and doesn&rsquo;t need to fetch pages from the heap to return the result. This optimization is called <code>index-only scan</code>. To understand how it works, consider the following scenario:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">create</span> <span style="color:#66d9ef">table</span> bar (a int, b int, <span style="color:#66d9ef">c</span> int);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">create</span> <span style="color:#66d9ef">index</span> abc_idx <span style="color:#66d9ef">on</span> bar(a, b);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/* query 1 */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">select</span> a, b <span style="color:#66d9ef">from</span> bar;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/* query 2 */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">select</span> a, b, <span style="color:#66d9ef">c</span> <span style="color:#66d9ef">from</span> bar;</span></span></code></pre></div>
+<p>In the first query, postgres can do an index-only scan and avoid fetching data from the heap because the values <code>a</code> and <code>b</code> are present in the index. In the second query, since <code>c</code> isn&rsquo;t in the index, posgres needs to follow the reference to the heap to fetch its value. In the first query we allowed postgres do to an index-only scan with the help of a multi-column index, but we could also achieve the same result by using a covering index. The syntax for creating a covering index looks like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">create</span> <span style="color:#66d9ef">index</span> abc_cov_idx <span style="color:#66d9ef">on</span> bar(a, b) <span style="color:#66d9ef">including</span> <span style="color:#66d9ef">c</span>;</span></span></code></pre></div>
+<p>This is more space efficient than creating a multi-column index on (a, b, c), because c will only be inserted at the leaf nodes of the btree. Also, we might want to use a covering index in cases where we want an unique index and <code>c</code> would &ldquo;break&rdquo; the uniqueness of the index.</p>
+<h3 id="hash">Hash</h3>
+<p>The hash index differs from B-Tree in strucutre, it is much more alike a hashmap data structure present in most programming languages (e.g. dict in Python, array in php, HashMap in java, object in js, etc). Instead of adding the full column value to the index, a 32bit hash code is derived from it and added to the hash. This makes hash indexes much smaller than btrees when indexing longer data such as UUIDs, URLs, etc. Any data type can be indexed with the help of postgres hashing functions. If you type <code>\df hash*</code> and press TAB in psql, you&rsquo;ll see that there are more then 50 hash related functions. Although it gracefully handles hash conflicts, it works better for even distribution of hash values and is most suited to unique or mostly unique data. Under the correct conditions it will not only be smaller than btree indexes, but also it will be faster for reads when compared with btress. Here&rsquo;s what the official docs says about it:</p>
+<blockquote>
+<p>&ldquo;In a B-tree index, searches must descend through the tree until the leaf page is found. In tables with millions of rows, this descent can increase access time to data. The equivalent of a leaf page in a hash index is referred to as a bucket page. In contrast, a hash index allows accessing the bucket pages directly, thereby potentially reducing index access time in larger tables. This reduction in &ldquo;logical I/O&rdquo; becomes even more pronounced on indexes/data larger than shared_buffers/RAM.&rdquo;</p>
+</blockquote>
+<p>As for its limitations, it only supports equality operations and isn&rsquo;t going to be helpful if you need to order by the indexed field. It also doesn&rsquo;t support multi-column indexes and checking for uniqueness.
+For a in-depth analysis of how hash indexes fare in relation to btree, check Evgeniy Demin&rsquo;s <a href="https://evgeniydemin.medium.com/postgresql-indexes-hash-vs-b-tree-84b4f6aa6d61">blog post</a> on the subject.</p>
+<h3 id="brin">BRIN</h3>
+<p>BRIN stands for Block Range Index and its name tells a lot about how it is implemented. Nodes in BRIN indexes store the minimum and maximum values of a range of values present in the page referred by the index. This makes the index more compact and cache friendly, but restricts the use cases for it. If you have a very large in a work load that is heavy on writes and low on deletes and updates. You can think of a BRIN index as an optimizer for sequential scans of large amounts of data in very large databases, and is a good optimization to try before partitioning a table. For a BRIN index to work well, the index key should be a column that strongly correlates to the location of the row in the heap.Some good use cases for BRIN are append-only tables and tables storing time series data.</p>
+<p>BRIN won&rsquo;t work well for tables where the rows are updated constantly, due to the nature of MVCC that duplicates rows and stores them in a different part of the heap. This tuple duplication and moving affect the correlation negatively and reduces the effectiveness of the index. Using extensions such as pg_repack or pg_squeeze isn&rsquo;t recommended for tables that use BRIN indexes, since they change the internal data layour fo the table and mess up the correlation. Also, this index is lossy in the sense that the index leaf nodes point to pages taht might contain a value within a particular range. For this reason a BRIN is more helpful if you need to return large subset of data, and a btree would be more read performant for queries that only return one or few rows. You can make the index more or less lossy by adjusting the <code>page_per_range</code> configuration, the trade off will be index size.</p>
+<h3 id="gin">GIN</h3>
+<p>Generalized inverted index is appropriate for when you want to search for an item in composite data, such as finding a word in a blob of text, an item in an array or an object in a JSON. The GIN is generalized in the sense that it doesn&rsquo;t need to know how it will acelerate the search for some item. Instead, there&rsquo;s a <a href="https://www.postgresql.org/docs/current/gin-builtin-opclasses.html">set of custom strategies</a> specific for each data type. Please note that in order to index an JSON value it needs to be stored in a JSONB column. Similarly, if you&rsquo;re indexing text it&rsquo;s better to store it as (or convert it to) tsvector or use the <a href="https://www.postgresql.org/docs/current/pgtrgm.html">pg_trgm</a> extension.</p>
+<h3 id="gist--sp-gist">GiST &amp; SP-GiST</h3>
+<p>The Generalized Search Tree and the Space-Partitioned Generalized Search Tree, are tree structures that can be use as a base template to implement indexes for specific data types. You can think of them as framework for building indexes. The GiST is a balanced tree and the SP-GiST allow for the development of non-balanced data structures. They are useful for indexing points and geometric types, inet, ranges and text vectors. You can find an <a href="https://www.postgresql.org/docs/16/gist-builtin-opclasses.html">extensive list</a> of the built-in strategies shipped with postgres in the official documentation. If you need an index to enable full-text search in your application, you&rsquo;ll have to choose between GIN and GiST. Roughly speaking, GIN is faster for lookups but it&rsquo;s bigger and has greater building and maintainance costs. So the right index type for you will depend on your application requirements.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>[todo]</p>
+<p>&mdash; notes
+Proper planner statistics are essential for good index usage, so make sure that your tables are frequently vacuumed and analyzed, and consider increasing the statistics target for columns that have high cardinality. If you don&rsquo;t do that the statistic sample is going to be too small to actually reflect the reality of the table.</p>
+<ul class="pa0">
+  
+</ul>
+<div class="mt6 instapaper_ignoref">
+      
+      
+      </div>
+    </div>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="http://localhost:1313/" >
+    &copy; 
+  </a>
+    <div>
+<div class="ananke-socials">
+  
+</div>
+</div>
+  </div>
+</footer>
+
+  </body>
+</html>
