@@ -179,7 +179,7 @@ In contrast with a binary tree, the BTree is a balanced tree and all of its leav
 Below there's a simplified illustration of a Postgres Btree. 
 
 
-![postgres btree](/images/postgres_btree.png)
+![postgres btree](https://dlt.github.io/blog/images/postgres_btree.png)
 
 #### Using multiple indexes
 Postgres can use multiple indexes to handle cases that cannot be handled by single index scans, by forming `AND` and `OR` conditions across several index scans with the support of bitmaps. The bitmaps are ANDed or ORed together as needed by the query and finally the table rows are visited and returned. Let's say we have a query like this:
