@@ -175,7 +175,7 @@ Another aspect of memory usage is that PostgreSQL uses work memory when it execu
 ### Btree
 The B-Tree is a very powerful algorithim from 1972. It is a common data structure not only in Postgres but in almost every database management system, since it is a very good general purpose index. It was invented by Rudolf Bayer and Edward M.McCreight while working at Boeing. Nobody really knows if the "B" in B-tree stands for Bayer, Boeing, balanced or better, and it doesn't really matter. What really matters is that it enables us to search elements in the tree in O(log n) time. If you're not familiar with Big-O notation, all you need to know is that is is really fast - you only need to make 20 comparisons in order to find an element in a set with 1 million items. This means that the database will avoid lots of disk page accesses to find the desired data.  In PostgreSQL the btree is the most common type of index and its the default, it's also used to support system and TOAST indexes. Even an empty database has hundreds of btree indexes. It is the only index type that can be used for primary and unique key constraints.
 
-In contrast with a binary tree, the BTree is a balanced tree and all of its leave nodes have the same distance from the root. The root nodes and inner nodes have pointers to lower levels, and the leaf nodes have the keys and pointers to the heap. Postgres btrees also have pointers to the left and right nodes for easier forward and backward scanning. Nodes can have multiple keys and these keys are sorted so that it's easy to walk in ordered directions and to perform ORDER BY and JOIN operations. The values are only stored in the leaf nodes, this makes the tree more compact and facilitates a full traversal of the objects in a tree with just a linear pass through all the leaf nodes. This is just a simplified description of PostgreSQL Btree indexes, if you want to get into the low level details, I suggest you to read the README and the paper that inspired them.
+In contrast with a binary tree, the BTree is a balanced tree and all of its leave nodes have the same distance from the root. The root nodes and inner nodes have pointers to lower levels, and the leaf nodes have the keys and pointers to the heap. Postgres btrees also have pointers to the left and right nodes for easier forward and backward scanning. Nodes can have multiple keys and these keys are sorted so that it's easy to walk in ordered directions and to perform ORDER BY and JOIN operations. The values are only stored in the leaf nodes, this makes the tree more compact and facilitates a full traversal of the objects in a tree with just a linear pass through all the leaf nodes. This is just a simplified description of PostgreSQL Btree indexes, if you want to get into the low level details, I suggest you to read the [README](https://github.com/postgres/postgres/blob/master/src/backend/access/nbtree/README) and the [paper](https://www.csd.uoc.gr/~hy460/pdf/p650-lehman) that inspired them.
 Below there's a simplified illustration of a Postgres Btree. 
 
 
@@ -229,7 +229,7 @@ Since postgres keeps statistics about the distribution of values in your table c
 
 {{< highlight sql >}}
 create index on tasks(status) where status <> 'TODO';
-{{</highlight  >}}
+{{< /highlight >}}
 
 #### Covering indexes 
 
@@ -282,7 +282,4 @@ The Generalized Search Tree and the Space-Partitioned Generalized Search Tree, a
 
 ## Conclusion
 
-[todo]
-
---- notes
-Proper planner statistics are essential for good index usage, so make sure that your tables are frequently vacuumed and analyzed, and consider increasing the statistics target for columns that have high cardinality. If you don't do that the statistic sample is going to be too small to actually reflect the reality of the table.
+Understanding and effectively using indexes is crucial for optimizing database performance in PostgreSQL. While indexes can greatly speed up query execution and improve overall efficiency, it's important to be mindful of their impact on write operations and storage. By carefully selecting the appropriate types of indexes based on your specific use cases you can ensure that your PostgreSQL database remains both fast and efficient. I hope this article thought you at least one thing you didn't know about indexes before, and that it was as fun informative for you to read it as it was for me to write it.
