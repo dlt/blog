@@ -6,7 +6,7 @@
     
     <title>Introduction to PostgreSQL Indexes | test</title>
     <meta name="viewport" content="width=device-width,minimum-scale=1">
-    <meta name="description" content="TLDR; This article is fruit of a bunch of notes I took in the last months while I read and watched everything I could put my hands on regarding indexes. I wanted to write about them because I wanted to make sure I got a good grasp of the theme, and it covers just the bare minimum knowledge of indexes a backend developer should know. If you want an in-depth discussion about indexes I suggest you to look at this amazing database agnostic resource put up by Markus Winand, or this series of blog posts by Egor Egorov.">
+    <meta name="description" content="Basics Indexes are special database objects primarily designed to increase the speed of data access, by allowing the database to read less data from the disk. They can also be used to enforce constraints like primary keys, unique keys and exclusion. Indexes are important for performance but do not speedup a query unless the query matches the columns and data types in the index. Also, as a very rough rule of thumb, an index will only help if less than 15-20% of the table will be returned in he query, otherwise the query planner might prefer a sequential scan.">
     <meta name="generator" content="Hugo 0.132.1">
     
     
@@ -37,7 +37,7 @@
     <meta property="og:url" content="https://example.org/posts/introduction-to-postgresql-indexes/">
   <meta property="og:site_name" content="test">
   <meta property="og:title" content="Introduction to PostgreSQL Indexes">
-  <meta property="og:description" content="TLDR; This article is fruit of a bunch of notes I took in the last months while I read and watched everything I could put my hands on regarding indexes. I wanted to write about them because I wanted to make sure I got a good grasp of the theme, and it covers just the bare minimum knowledge of indexes a backend developer should know. If you want an in-depth discussion about indexes I suggest you to look at this amazing database agnostic resource put up by Markus Winand, or this series of blog posts by Egor Egorov.">
+  <meta property="og:description" content="Basics Indexes are special database objects primarily designed to increase the speed of data access, by allowing the database to read less data from the disk. They can also be used to enforce constraints like primary keys, unique keys and exclusion. Indexes are important for performance but do not speedup a query unless the query matches the columns and data types in the index. Also, as a very rough rule of thumb, an index will only help if less than 15-20% of the table will be returned in he query, otherwise the query planner might prefer a sequential scan.">
   <meta property="og:locale" content="en_us">
   <meta property="og:type" content="article">
     <meta property="article:section" content="posts">
@@ -45,13 +45,13 @@
     <meta property="article:modified_time" content="2024-08-17T18:38:51+04:00">
 
   <meta itemprop="name" content="Introduction to PostgreSQL Indexes">
-  <meta itemprop="description" content="TLDR; This article is fruit of a bunch of notes I took in the last months while I read and watched everything I could put my hands on regarding indexes. I wanted to write about them because I wanted to make sure I got a good grasp of the theme, and it covers just the bare minimum knowledge of indexes a backend developer should know. If you want an in-depth discussion about indexes I suggest you to look at this amazing database agnostic resource put up by Markus Winand, or this series of blog posts by Egor Egorov.">
+  <meta itemprop="description" content="Basics Indexes are special database objects primarily designed to increase the speed of data access, by allowing the database to read less data from the disk. They can also be used to enforce constraints like primary keys, unique keys and exclusion. Indexes are important for performance but do not speedup a query unless the query matches the columns and data types in the index. Also, as a very rough rule of thumb, an index will only help if less than 15-20% of the table will be returned in he query, otherwise the query planner might prefer a sequential scan.">
   <meta itemprop="datePublished" content="2024-08-17T18:38:51+04:00">
   <meta itemprop="dateModified" content="2024-08-17T18:38:51+04:00">
-  <meta itemprop="wordCount" content="3815">
+  <meta itemprop="wordCount" content="3692">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Introduction to PostgreSQL Indexes">
-  <meta name="twitter:description" content="TLDR; This article is fruit of a bunch of notes I took in the last months while I read and watched everything I could put my hands on regarding indexes. I wanted to write about them because I wanted to make sure I got a good grasp of the theme, and it covers just the bare minimum knowledge of indexes a backend developer should know. If you want an in-depth discussion about indexes I suggest you to look at this amazing database agnostic resource put up by Markus Winand, or this series of blog posts by Egor Egorov.">
+  <meta name="twitter:description" content="Basics Indexes are special database objects primarily designed to increase the speed of data access, by allowing the database to read less data from the disk. They can also be used to enforce constraints like primary keys, unique keys and exclusion. Indexes are important for performance but do not speedup a query unless the query matches the columns and data types in the index. Also, as a very rough rule of thumb, an index will only help if less than 15-20% of the table will be returned in he query, otherwise the query planner might prefer a sequential scan.">
 
 	
   </head>
@@ -124,9 +124,7 @@
       
       
     </header>
-    <div class="nested-copy-line-height lh-copy serif f4 nested-links mid-gray pr4-l w-two-thirds-l"><h2 id="tldr">TLDR;</h2>
-<p>This article is fruit of a bunch of notes I took in the last months while I read and watched everything I could put my hands on regarding indexes. I wanted to write about them because I wanted to make sure I got a good grasp of the theme, and it covers just the bare minimum knowledge of indexes a backend developer should know. If you want an in-depth discussion about indexes I suggest you to look at this amazing database agnostic <a href="https://use-the-index-luke.com/">resource put up by Markus Winand</a>, or this <a href="https://postgrespro.com/blog/pgsql/3994098">series of blog posts</a> by Egor Egorov. <a href="https://www.youtube.com/@PostgresTV">PostgresFM</a> podcast also has lots of materials about indexes and everything Postgres. Of course there&rsquo;s also a lot of useful information in the <a href="https://www.postgresql.org/docs/16/indexes.html">official docs</a>.</p>
-<h2 id="basics">Basics</h2>
+    <div class="nested-copy-line-height lh-copy serif f4 nested-links mid-gray pr4-l w-two-thirds-l"><h2 id="basics">Basics</h2>
 <p>Indexes are special database objects primarily designed to increase the speed of data access, by allowing the database to read less data from the disk. They can also be used to enforce constraints like primary keys, unique keys and exclusion. Indexes are important for performance but do not speedup a query unless the query matches the columns and data types in the index. Also, as a very rough rule of thumb, an index will only help if less than 15-20% of the table will be returned in he query, otherwise the query planner might prefer a sequential scan. If your query returns a large percentage of the table, consider refactoring it, using summary tables or other techniques before throwing an index at the problem. It&rsquo;s also good to keep in mind that the whole indexed column is copied in every node of the btree, since there&rsquo;s a limit in node size capacity, the larger the indexed column the deeper the tree will be. With that in mind, let&rsquo;s give a closer look at how Postgres stores your data in the disk and how indexes help to speedup querying this data.</p>
 <p>There are six types of indexes available in the default postgres installation and more types available through extensions. Typically, they work by associating a key value with a data location in one or more rows of the table containing that key. Each line is identified by a TID, or tuple id.</p>
 <h3 id="how-data-is-stored-in-disk">How data is stored in disk</h3>

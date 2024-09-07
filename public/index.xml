@@ -13,7 +13,7 @@
       <link>https://example.org/posts/introduction-to-postgresql-indexes/</link>
       <pubDate>Sat, 17 Aug 2024 18:38:51 +0400</pubDate>
       <guid>https://example.org/posts/introduction-to-postgresql-indexes/</guid>
-      <description>TLDR; This article is fruit of a bunch of notes I took in the last months while I read and watched everything I could put my hands on regarding indexes. I wanted to write about them because I wanted to make sure I got a good grasp of the theme, and it covers just the bare minimum knowledge of indexes a backend developer should know. If you want an in-depth discussion about indexes I suggest you to look at this amazing database agnostic resource put up by Markus Winand, or this series of blog posts by Egor Egorov.</description>
+      <description>Basics Indexes are special database objects primarily designed to increase the speed of data access, by allowing the database to read less data from the disk. They can also be used to enforce constraints like primary keys, unique keys and exclusion. Indexes are important for performance but do not speedup a query unless the query matches the columns and data types in the index. Also, as a very rough rule of thumb, an index will only help if less than 15-20% of the table will be returned in he query, otherwise the query planner might prefer a sequential scan.</description>
     </item>
   </channel>
 </rss>

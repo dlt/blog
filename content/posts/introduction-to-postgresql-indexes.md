@@ -5,9 +5,6 @@ draft = false
 +++
 
 
-## TLDR;
-This article is fruit of a bunch of notes I took in the last months while I read and watched everything I could put my hands on regarding indexes. I wanted to write about them because I wanted to make sure I got a good grasp of the theme, and it covers just the bare minimum knowledge of indexes a backend developer should know. If you want an in-depth discussion about indexes I suggest you to look at this amazing database agnostic [resource put up by Markus Winand](https://use-the-index-luke.com/), or this [series of blog posts](https://postgrespro.com/blog/pgsql/3994098) by Egor Egorov. [PostgresFM](https://www.youtube.com/@PostgresTV) podcast also has lots of materials about indexes and everything Postgres. Of course there's also a lot of useful information in the [official docs](https://www.postgresql.org/docs/16/indexes.html).  
-
 ## Basics
 Indexes are special database objects primarily designed to increase the speed of data access, by allowing the database to read less data from the disk. They can also be used to enforce constraints like primary keys, unique keys and exclusion. Indexes are important for performance but do not speedup a query unless the query matches the columns and data types in the index. Also, as a very rough rule of thumb, an index will only help if less than 15-20% of the table will be returned in he query, otherwise the query planner might prefer a sequential scan. If your query returns a large percentage of the table, consider refactoring it, using summary tables or other techniques before throwing an index at the problem. It's also good to keep in mind that the whole indexed column is copied in every node of the btree, since there's a limit in node size capacity, the larger the indexed column the deeper the tree will be. With that in mind, let's give a closer look at how Postgres stores your data in the disk and how indexes help to speedup querying this data.
 
