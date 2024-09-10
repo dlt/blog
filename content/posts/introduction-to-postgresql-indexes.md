@@ -4,7 +4,6 @@ date = 2024-08-17T18:38:51+04:00
 draft = false
 +++
 
-
 ## Basics
 Indexes are special database objects primarily designed to increase the speed of data access, by allowing the database to read less data from the disk. They can also be used to enforce constraints like primary keys, unique keys and exclusion. Indexes are important for performance but do not speedup a query unless the query matches the columns and data types in the index. Also, as a very rough rule of thumb, an index will only help if less than 15-20% of the table will be returned in he query, otherwise the query planner might prefer a sequential scan. If your query returns a large percentage of the table, consider refactoring it, using summary tables or other techniques before throwing an index at the problem. It's also good to keep in mind that the whole indexed column is copied in every node of the btree, since there's a limit in node size capacity, the larger the indexed column the deeper the tree will be. With that in mind, let's give a closer look at how Postgres stores your data in the disk and how indexes help to speedup querying this data.
 
@@ -23,7 +22,7 @@ We can enter psql and use `show data_directory` to show the directory Postgres u
  /opt/homebrew/var/postgresql@16
 {{< / highlight >}}
 
-Now we can use the internal `pg_class` to find the file where the heap a table is stored:
+Now we can use the internal `pg_class` to find the file where the heap table is stored:
 
 {{< highlight sql >}}
 create table foo (id int, name text);
@@ -95,7 +94,7 @@ ls -lrtah /opt/homebrew/var/postgresql@16/base/71122/71123
 -rw-------  1 dlt  admin    30M 16 Aug 16:32 /opt/homebrew/var/postgresql@16/base/71122/71133
 {{< / highlight >}}
 
-When we query a table without an index, Postgres reads all tuples in every page and apply a filter. For example, let's analyze the command below that searches for rows whose `name` column value is equal to "Ronaldo" and show how the database performed this search. We use the explain command with the options `(analyse, buffers)`. `analyse` will actually execute the query instead of just using cost estimates, and `buffers` will show buffer reads.
+When we query a table without an index, Postgres reads all tuples in every page and apply a filter. For example, let's analyze the command below that searches for rows whose `name` column value is equal to "Ronaldo" and show how the database performed this search. We use the explain command with the options `(analyse, buffers)`. `analyse` will actually execute the query instead of just using cost estimates, and the `buffers` option shows how much IO work was done.
 
 {{< highlight sql >}}
  explain (analyze, buffers) select * from foo where name = 'Ronaldo';
@@ -115,7 +114,7 @@ When we query a table without an index, Postgres reads all tuples in every page 
 
 Note the in output the line starting with " -> Parallel Seq scan on foo". This line denotes that the database performed a sequential search and read all the rows in the table. The execution time for this query was 265.021ms. Also note the line that says "Buffers: shared hit=97 read=6272". This mean that we needed to read 97 pages from memory, and 6272 pages from disk.
 
-Now let's add an index on the name colum and see how the same query performs. We're using the command `create index concurrently` because we don't want to block the table for writes.
+Now let's add an index on the name column and see how the same query performs. We're using the command `create index concurrently` because we don't want to block the table for writes.
 
 {{< highlight sql >}}
 create index concurrently on foo(name);
@@ -153,13 +152,13 @@ If we use `\di+` to show the indexes in our database we can see that the index w
 It is important to highlight that the extra speed brought by indices is associated with several costs that must be considered when deciding where and how to apply them.
 
 ### Disk Space
-Indexes are stored in a separate area of the heap and take up additional disk space. The more indexes a table has, the greater the amount of disk space required to store them. This incurs in additional storage costs for your database and for backups, increased replication traffic, and increased backup and failover recovery times. Bear in mind that its not uncommon for btree indexes to be larger than the database itself. Learning about partial indexes, and multicolumn indexes, as well as about other more space efficient index types such as BRIN can be helpful. 
+Indexes are stored in a separate area of the heap and take up additional disk space. The more indexes a table has, the greater the amount of disk space required to store them. This incurs in additional storage costs for your database and for backups, increased replication traffic, and increased backup and failover recovery times. Bear in mind that its not uncommon for btree indexes to be larger than the table itself. Learning about partial indexes, and multicolumn indexes, as well as about other more space efficient index types such as BRIN can be helpful. 
 
 ### Write operations
-Also, there is a maintenance cost in writing operations such as UPDATE, INSERT and DELETE, if a field that is part of an index is modified, as the corresponding index needs to be updated, which can add significant overhead to the writing process. [show graph with number of indexes and write overhead upon updates]
+Also, there is a maintenance cost in writing operations such as UPDATE, INSERT and DELETE, if a field that is part of an index is modified, the corresponding index needs to be updated, which can add significant overhead to the writing process. 
 
 ### Query planner
-The presence of indexes increases the complexity of the query planner's work, which is the component responsible for determining the best execution strategy for a query. With more indexes available, the query planner has more options to consider, which can increase the time needed to plan the query, especially in systems with many complex queries or where there are many indexes available. [show graph with relationship between number of indexes and planning time].
+The query planner (also known as query optimizer) is the component responsible for determining the best execution strategy for a query. With more indexes available, the query planner has more options to consider, which can increase the time needed to plan the query, especially in systems with many complex queries or where there are many indexes available. 
 
 ### Memory usage
 PostgreSQL maintains a portion of frequently accessed data and index pages in memory in its shared buffers. When an index is used, the relevant index pages are loaded into shared buffers to speed up access. The more indexes you have and the more they are used, the more shared buffer memory is necessary. Since shared buffers are limited and are also used for caching data pages, filling the shared buffers with indexes can lead to less efficient caching of table data.
@@ -188,8 +187,7 @@ select * from users where age = 30 and login_count = 100;
 If the `age` and `login_count` columns are indexed, postgres scans index `age` for all pages with `age=30` and makes a bitmap where the pages that might contain rows with `age=30` are true. In a similar way, it builds a bitmap using the `login_count` index. It then ANDs the two bitmaps to form a third bitmap, and performs a table scan, only reading the pages that might contain candidate values, and only adding the rows where `age=30 and login_count=100` to the result set.
 
 #### Multi-column indexes
-Multi-column indexes are an alternative for using multiple indexes. They're generaly going to be smaller and faster than using multiple indexes, but they'll also be less flexible. That's because the order of the columns matter, because the database can search for a subset of the indexed columns, as long as they are the leftmost columns. For example, if you have an index on column `a` and another index on column `b`, these indexes will serve all the of queries above:
-
+Multi-column indexes are an alternative for using multiple indexes. They're generaly going to be smaller and faster than using multiple indexes, but they'll also be less flexible. That's because the order of the columns matter, because the database can search for a subset of the indexed columns, as long as they are the leftmost columns. For example, if you have an index on column `a` and another index on column `b`, these indexes will serve all the of queries below:
 
 {{< highlight sql >}}
 select * from my_table where a = 42 and b = 420;
@@ -203,7 +201,12 @@ select * from my_table where b = 99;
 On the other hand, only the first two queries would use an index if you created a multi-column index on (a, b) with a command like `create index on my_table(a, b)`; So, when building multi-column indexes choose the order of the columns well so that your index can be used by the most queries possible. 
 
 #### Partial indexes
-Partial indexes allow you to use a conditional expression to control what subset of rows will be indexed, so that your index can be smaller and more likely to fit in RAM. They're mostly useful in situations where you don't care about some rows, or when you're indexing on a column where the proportion of one value is much greater than others. I'll give two examples below.
+Partial indexes allow you to use a conditional expression to control what subset of rows will be indexed, this can bring you many benefits:
+- your index can be smaller and more likely fit in RAM. 
+- your index is shallower, so lookups are quicker
+- less overhead for index/update/delete (but can also mean more overhead if the column you're using to filter rows in/out of the index is updated very frequently triggering constant index maintenance)
+
+They're mostly useful in situations where you don't care about some rows, or when you're indexing on a column where the proportion of one value is much greater than others. I'll give two examples below.
 
 ##### When you don't care about some rows
 
@@ -253,9 +256,43 @@ create index abc_cov_idx on bar(a, b) including c;
 
 This is more space efficient than creating a multi-column index on (a, b, c), because c will only be inserted at the leaf nodes of the btree. Also, we might want to use a covering index in cases where we want an unique index and `c` would "break" the uniqueness of the index.
 
+#### Expression indexes
+
+Expression indexes are a powerful feature in PostgreSQL that allow you to index the result of an expression or function, rather than just the raw column values. This can be extremely useful when you frequently query based on a transformed version of your data.
+
+Let's look at an example to understand how expression indexes work:
+
+{{< highlight sql >}}
+CREATE TABLE customers (
+    id SERIAL PRIMARY KEY,
+    name TEXT
+);
+
+-- Create an expression index on the lowercase version of the name
+CREATE INDEX idx_lower_name ON customers (LOWER(name));
+{{< /highlight >}}
+
+In this example, we've created an index on the lowercase version of the `name` column. This index will be useful for case-insensitive searches.
+
+Now, when you run a query like this:
+
+{{< highlight sql >}}
+SELECT * FROM customers WHERE LOWER(name) = 'john doe';
+{{< /highlight >}}
+
+PostgreSQL can use the expression index to efficiently find the matching rows, without having to apply the `LOWER()` function to every row in the table.
+
+Expression indexes can be created using various types of expressions:
+
+1. Built-in functions: Like `LOWER()`, `UPPER()`, `SUBSTR()`, etc.
+2. User-defined functions: As long as they are immutable.
+3. String manipulations: Like `first_name || ' ' || last_name`.
+
+It's important to note that for an expression index to be used, the query must match the indexed expression exactly. For example, if you have an index on `LOWER(name)`, a query using `UPPER(name)` won't be able to use that index.
+
 
 ### Hash
-The hash index differs from B-Tree in strucutre, it is much more alike a hashmap data structure present in most programming languages (e.g. dict in Python, array in php, HashMap in java, object in js, etc). Instead of adding the full column value to the index, a 32bit hash code is derived from it and added to the hash. This makes hash indexes much smaller than btrees when indexing longer data such as UUIDs, URLs, etc. Any data type can be indexed with the help of postgres hashing functions. If you type `\df hash*` and press TAB in psql, you'll see that there are more then 50 hash related functions. Although it gracefully handles hash conflicts, it works better for even distribution of hash values and is most suited to unique or mostly unique data. Under the correct conditions it will not only be smaller than btree indexes, but also it will be faster for reads when compared with btress. Here's what the official docs says about it:
+The hash index differs from B-Tree in strucutre, it is much more alike a hashmap data structure present in most programming languages (e.g. dict in Python, array in php, HashMap in java, etc). Instead of adding the full column value to the index, a 32bit hash code is derived from it and added to the hash. This makes hash indexes much smaller than btrees when indexing longer data such as UUIDs, URLs, etc. Any data type can be indexed with the help of postgres hashing functions. If you type `\df hash*` and press TAB in psql, you'll see that there are more then 50 hash related functions. Although it gracefully handles hash conflicts, it works better for even distribution of hash values and is most suited to unique or mostly unique data. Under the correct conditions it will not only be smaller than btree indexes, but also it will be faster for reads when compared with btress. Here's what the official docs says about it:
 
 > "In a B-tree index, searches must descend through the tree until the leaf page is found. In tables with millions of rows, this descent can increase access time to data. The equivalent of a leaf page in a hash index is referred to as a bucket page. In contrast, a hash index allows accessing the bucket pages directly, thereby potentially reducing index access time in larger tables. This reduction in "logical I/O" becomes even more pronounced on indexes/data larger than shared_buffers/RAM."  
 
@@ -274,9 +311,55 @@ Generalized inverted index is appropriate for when you want to search for an ite
 
 ### GiST & SP-GiST
 
-The Generalized Search Tree and the Space-Partitioned Generalized Search Tree, are tree structures that can be use as a base template to implement indexes for specific data types. You can think of them as framework for building indexes. The GiST is a balanced tree and the SP-GiST allow for the development of non-balanced data structures. They are useful for indexing points and geometric types, inet, ranges and text vectors. You can find an [extensive list](https://www.postgresql.org/docs/16/gist-builtin-opclasses.html) of the built-in strategies shipped with postgres in the official documentation. If you need an index to enable full-text search in your application, you'll have to choose between GIN and GiST. Roughly speaking, GIN is faster for lookups but it's bigger and has greater building and maintainance costs. So the right index type for you will depend on your application requirements. 
+The Generalized Search Tree and the Space-Partitioned Generalized Search Tree are tree structures that can be use as a base template to implement indexes for specific data types. You can think of them as framework for building indexes. The GiST is a balanced tree and the SP-GiST allow for the development of non-balanced data structures. They are useful for indexing points and geometric types, inet, ranges and text vectors. You can find an [extensive list](https://www.postgresql.org/docs/16/gist-builtin-opclasses.html) of the built-in strategies shipped with postgres in the official documentation. If you need an index to enable full-text search in your application, you'll have to choose between GIN and GiST. Roughly speaking, GIN is faster for lookups but it's bigger and has greater building and maintainance costs. So the right index type for you will depend on your application requirements. 
 
 
 ## Conclusion
 
 Understanding and effectively using indexes is crucial for optimizing database performance in PostgreSQL. While indexes can greatly speed up query execution and improve overall efficiency, it's important to be mindful of their impact on write operations and storage. By carefully selecting the appropriate types of indexes based on your specific use cases you can ensure that your PostgreSQL database remains both fast and efficient. I hope this article thought you at least one thing you didn't know about indexes before, and that it was as fun informative for you to read it as it was for me to write it.
+
+momjian index presentation notes:
+
+- btrees drawbacks
+  - good for unique keys
+  - usually big
+  - bad performance for non-linear data
+  - bad perf for indexing data with many duplicates
+  - bad for closest-match searches
+  - bad for multi-valued fields
+
+
+- BRIN
+ - invented by chilean
+ - primarily design for data warehosue
+ - allow skiping large sections of the table
+ - not expensive for update
+ - slower lookups than b-tree
+ - super small. index 0.003% of the table.
+ - good if you need to index many columsn
+ - check postgres docs if use jsonb_ops or jsob_path_ops, if you checking for nested values, more compact. if you're doing a lot of lookups for exact matches.
+ 
+
+- GIN
+  - fantastic for indexes that have duplicates [text, json, multidimensional arrays]
+  - optimized for mult-row matches
+  - key stored only once
+  - index updates are batched, though always checked for accuracy
+  - compression capabilities and multi column filtering
+
+
+- GiST
+  - supports distance operator  for KNN matches
+  - used for geometry, ranges, 
+  - good for everything elese
+
+- SP-GIST
+  - similar to GiST but keys can be split apart
+  idea for indexes whos keys have many duplicate preixes
+
+- Hash indexes
+  - 
+
+
+- every indexing method is not supports every datatype (ex. cannot use btree index on polygon)
+- gin only suports array,json, jsonb, jsonb_path, tsvector. can support more via extension
