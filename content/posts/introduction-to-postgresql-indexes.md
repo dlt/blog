@@ -258,9 +258,7 @@ This is more space efficient than creating a multi-column index on (a, b, c), be
 
 #### Expression indexes
 
-Expression indexes are a powerful feature in PostgreSQL that allow you to index the result of an expression or function, rather than just the raw column values. This can be extremely useful when you frequently query based on a transformed version of your data.
-
-Let's look at an example to understand how expression indexes work:
+Expression indexes to index the result of an expression or function, rather than just the raw column values. This can be extremely useful when you frequently query based on a transformed version of your data. It is necessary if you use a function as part of a where clause as in the example below:
 
 {{< highlight sql >}}
 CREATE TABLE customers (
@@ -268,28 +266,26 @@ CREATE TABLE customers (
     name TEXT
 );
 
--- Create an expression index on the lowercase version of the name
-CREATE INDEX idx_lower_name ON customers (LOWER(name));
+CREATE INDEX idx_name ON customers(name);
+SELECT * FROM customers WHERE LOWER(name) = 'john doe';
+
 {{< /highlight >}}
 
-In this example, we've created an index on the lowercase version of the `name` column. This index will be useful for case-insensitive searches.
+In this example above, Postgres won't use the index because it was was built against the `name` column. In order to make it work, the index key has to call the `lower` function just like it's used in the where clase. To fix it, do:
 
 Now, when you run a query like this:
 
 {{< highlight sql >}}
-SELECT * FROM customers WHERE LOWER(name) = 'john doe';
+CREATE INDEX idx_lower_name ON customers (lower(name));
 {{< /highlight >}}
 
-PostgreSQL can use the expression index to efficiently find the matching rows, without having to apply the `LOWER()` function to every row in the table.
+Now PostgreSQL can use the expression index to efficiently find the matching rows.
 
 Expression indexes can be created using various types of expressions:
 
-1. Built-in functions: Like `LOWER()`, `UPPER()`, `SUBSTR()`, etc.
+1. Built-in functions: Like `lower()`, `upper()`, etc.
 2. User-defined functions: As long as they are immutable.
-3. String manipulations: Like `first_name || ' ' || last_name`.
-
-It's important to note that for an expression index to be used, the query must match the indexed expression exactly. For example, if you have an index on `LOWER(name)`, a query using `UPPER(name)` won't be able to use that index.
-
+3. String concatenations: Like `first_name || ' ' || last_name`.
 
 ### Hash
 The hash index differs from B-Tree in strucutre, it is much more alike a hashmap data structure present in most programming languages (e.g. dict in Python, array in php, HashMap in java, etc). Instead of adding the full column value to the index, a 32bit hash code is derived from it and added to the hash. This makes hash indexes much smaller than btrees when indexing longer data such as UUIDs, URLs, etc. Any data type can be indexed with the help of postgres hashing functions. If you type `\df hash*` and press TAB in psql, you'll see that there are more then 50 hash related functions. Although it gracefully handles hash conflicts, it works better for even distribution of hash values and is most suited to unique or mostly unique data. Under the correct conditions it will not only be smaller than btree indexes, but also it will be faster for reads when compared with btress. Here's what the official docs says about it:
