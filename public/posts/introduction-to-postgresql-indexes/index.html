@@ -48,7 +48,7 @@
   <meta itemprop="description" content="Basics Indexes are special database objects primarily designed to increase the speed of data access, by allowing the database to read less data from the disk. They can also be used to enforce constraints like primary keys, unique keys and exclusion. Indexes are important for performance but do not speedup a query unless the query matches the columns and data types in the index. Also, as a very rough rule of thumb, an index will only help if less than 15-20% of the table will be returned in he query, otherwise the query planner might prefer a sequential scan.">
   <meta itemprop="datePublished" content="2024-08-17T18:38:51+04:00">
   <meta itemprop="dateModified" content="2024-08-17T18:38:51+04:00">
-  <meta itemprop="wordCount" content="4104">
+  <meta itemprop="wordCount" content="3909">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Introduction to PostgreSQL Indexes">
   <meta name="twitter:description" content="Basics Indexes are special database objects primarily designed to increase the speed of data access, by allowing the database to read less data from the disk. They can also be used to enforce constraints like primary keys, unique keys and exclusion. Indexes are important for performance but do not speedup a query unless the query matches the columns and data types in the index. Also, as a very rough rule of thumb, an index will only help if less than 15-20% of the table will be returned in he query, otherwise the query planner might prefer a sequential scan.">
@@ -328,81 +328,6 @@ For a in-depth analysis of how hash indexes fare in relation to btree, check Evg
 <p>The Generalized Search Tree and the Space-Partitioned Generalized Search Tree are tree structures that can be use as a base template to implement indexes for specific data types. You can think of them as framework for building indexes. The GiST is a balanced tree and the SP-GiST allow for the development of non-balanced data structures. They are useful for indexing points and geometric types, inet, ranges and text vectors. You can find an <a href="https://www.postgresql.org/docs/16/gist-builtin-opclasses.html">extensive list</a> of the built-in strategies shipped with postgres in the official documentation. If you need an index to enable full-text search in your application, you&rsquo;ll have to choose between GIN and GiST. Roughly speaking, GIN is faster for lookups but it&rsquo;s bigger and has greater building and maintainance costs. So the right index type for you will depend on your application requirements.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>Understanding and effectively using indexes is crucial for optimizing database performance in PostgreSQL. While indexes can greatly speed up query execution and improve overall efficiency, it&rsquo;s important to be mindful of their impact on write operations and storage. By carefully selecting the appropriate types of indexes based on your specific use cases you can ensure that your PostgreSQL database remains both fast and efficient. I hope this article thought you at least one thing you didn&rsquo;t know about indexes before, and that it was as fun informative for you to read it as it was for me to write it.</p>
-<p>momjian index presentation notes:</p>
-<ul>
-<li>
-<p>btrees drawbacks</p>
-<ul>
-<li>good for unique keys</li>
-<li>usually big</li>
-<li>bad performance for non-linear data</li>
-<li>bad perf for indexing data with many duplicates</li>
-<li>bad for closest-match searches</li>
-<li>bad for multi-valued fields</li>
-</ul>
-</li>
-<li>
-<p>BRIN</p>
-</li>
-<li>
-<p>invented by chilean</p>
-</li>
-<li>
-<p>primarily design for data warehosue</p>
-</li>
-<li>
-<p>allow skiping large sections of the table</p>
-</li>
-<li>
-<p>not expensive for update</p>
-</li>
-<li>
-<p>slower lookups than b-tree</p>
-</li>
-<li>
-<p>super small. index 0.003% of the table.</p>
-</li>
-<li>
-<p>good if you need to index many columsn</p>
-</li>
-<li>
-<p>check postgres docs if use jsonb_ops or jsob_path_ops, if you checking for nested values, more compact. if you&rsquo;re doing a lot of lookups for exact matches.</p>
-</li>
-<li>
-<p>GIN</p>
-<ul>
-<li>fantastic for indexes that have duplicates [text, json, multidimensional arrays]</li>
-<li>optimized for mult-row matches</li>
-<li>key stored only once</li>
-<li>index updates are batched, though always checked for accuracy</li>
-<li>compression capabilities and multi column filtering</li>
-</ul>
-</li>
-<li>
-<p>GiST</p>
-<ul>
-<li>supports distance operator  for KNN matches</li>
-<li>used for geometry, ranges,</li>
-<li>good for everything elese</li>
-</ul>
-</li>
-<li>
-<p>SP-GIST</p>
-<ul>
-<li>similar to GiST but keys can be split apart
-idea for indexes whos keys have many duplicate preixes</li>
-</ul>
-</li>
-<li>
-<h2 id="hash-indexes">Hash indexes</h2>
-</li>
-<li>
-<p>every indexing method is not supports every datatype (ex. cannot use btree index on polygon)</p>
-</li>
-<li>
-<p>gin only suports array,json, jsonb, jsonb_path, tsvector. can support more via extension</p>
-</li>
-</ul>
 <ul class="pa0">
   
 </ul>
