@@ -68,7 +68,7 @@ INSERT 0 1
 {{< / highlight >}}
 
 
-We can add the `ctid` field to the query to retrieve the ctid of each line. The ctid is an internal field that has the address of the line in the heap and is composed of a tuple in the format (m, n) where m is the block id and n is the tuple offset. "ctid" stands for "current tuple id". Here you can note that the row with id one is stored in the page 0, offset 1. 
+We can add the `ctid` field to the query to retrieve the ctid of each line. The ctid is an internal field that has the address of the line in the heap. Think of it as a pointer to the row location in the heap. It consists of a tuple in the format (m, n) where m is the block id and n is the tuple offset. "ctid" stands for "current tuple id". Here you can note that the row with id one is stored in the page 0, offset 1. 
 
 {{< highlight sql >}}
 select ctid, * from foo;
@@ -174,7 +174,6 @@ The B-Tree is a very powerful data structure, present not only in Postgres but i
 In contrast with a binary tree, the BTree is a balanced tree and all of its leave nodes have the same distance from the root. The root nodes and inner nodes have pointers to lower levels, and the leaf nodes have the keys and pointers to the heap. Postgres btrees also have pointers to the left and right nodes for easier forward and backward scanning. Nodes can have multiple keys and these keys are sorted so that it's easy to walk in ordered directions and to perform ORDER BY and JOIN operations. The values are only stored in the leaf nodes, this makes the tree more compact and facilitates a full traversal of the objects in a tree with just a linear pass through all the leaf nodes. This is just a simplified description of PostgreSQL Btree indexes, if you want to get into the low level details, I suggest you to read the [README](https://github.com/postgres/postgres/blob/master/src/backend/access/nbtree/README) and the [paper](https://www.csd.uoc.gr/~hy460/pdf/p650-lehman) that inspired them.
 Below there's a simplified illustration of a Postgres Btree. 
 
-
 ![postgres btree](https://dlt.github.io/blog/images/postgres_btree.png)
 
 #### Using multiple indexes
@@ -248,7 +247,6 @@ select a, b, c from bar;
 {{< /highlight >}}
 
 In the first query, postgres can do an index-only scan and avoid fetching data from the heap because the values `a` and `b` are present in the index. In the second query, since `c` isn't in the index, posgres needs to follow the reference to the heap to fetch its value. In the first query we allowed postgres do to an index-only scan with the help of a multi-column index, but we could also achieve the same result by using a covering index. The syntax for creating a covering index looks like this:
-
 
 {{< highlight sql >}}
 create index abc_cov_idx on bar(a, b) including c;
