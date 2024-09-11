@@ -1,6 +1,6 @@
 +++
 title = 'Introduction to PostgreSQL Indexes'
-date = 2024-08-17T18:38:51+04:00
+date = 2024-09-11T12:07:51+04:00
 draft = false
 +++
 
