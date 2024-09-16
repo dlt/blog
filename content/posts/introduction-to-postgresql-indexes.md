@@ -3,16 +3,19 @@ title = 'Introduction to PostgreSQL Indexes'
 date = 2024-09-11T12:07:51+04:00
 draft = false
 +++
+## Who's this for
+This text is for developers that have an intuitive knowledge of what database indexes are, but don't necessarily know how they work internaly, what are the tradeoffs associated with indexes, what are the types of indexes provided by postgres and how you can use some of its more advanced options to make them more optimized for your use case.
 
 ## Basics
-Indexes are special database objects primarily designed to increase the speed of data access, by allowing the database to read less data from the disk. They can also be used to enforce constraints like primary keys, unique keys and exclusion. Indexes are important for performance but do not speedup a query unless the query matches the columns and data types in the index. Also, as a very rough rule of thumb, an index will only help if less than 15-20% of the table will be returned in he query, otherwise the query planner might prefer a sequential scan. If your query returns a large percentage of the table, consider refactoring it, using summary tables or other techniques before throwing an index at the problem. It's also good to keep in mind that the whole indexed column is copied in every node of the btree, since there's a limit in node size capacity, the larger the indexed column the deeper the tree will be. With that in mind, let's give a closer look at how Postgres stores your data in the disk and how indexes help to speedup querying this data.
+Indexes are special database objects primarily designed to increase the speed of data access, by allowing the database to read less data from the disk. They can also be used to enforce constraints like primary keys, unique keys and exclusion. Indexes are important for performance but do not speedup a query unless the query matches the columns and data types in the index. Also, as a very rough rule of thumb, an index will only help if less than 15-20% of the table will be returned in the query, otherwise the query planner, a part of postgres used to determine how the query is going to be executed, might prefer a sequential scan. In fact, reality is much more complex than this rule of thumb. The query planner uses statistics and predefined costs associated with each type of scan to do its job, but we're only going approach the query planner behavior tangentially in this article. So, if your query returns a large percentage of the table, consider refactoring it, using summary tables or other techniques before throwing an index at the problem. With that in mind, let's give a closer look at how Postgres stores your data in the disk and how indexes help to speedup querying this data.
+
 
 There are six types of indexes available in the default postgres installation and more types available through extensions. Typically, they work by associating a key value with a data location in one or more rows of the table containing that key. Each line is identified by a TID, or tuple id.
 
 ### How data is stored in disk
-To understand indexes, it is important to first understand how postgres stores table data on disk. Every table in postgres has one (or more) corresponding file(s) on disk (depends on the size of the table). All table rows, internally referred to as "tuples", are saved in this file and do not have a specific order. This file is also called heap and is divided into 8kb pages.
+To understand indexes, it is important to first understand how postgres stores table data on disk. Every table in postgres has one or more corresponding files on disk, depending on its size. This set of files is called a heap and it is divided into 8kb pagesh. All table rows, internally referred to as "tuples", are saved in these files and do not have a specific order. The index is a tree structure that links the indexes columns to the row locators, also known as ctid, in the heap. We'll zoom into the index internals later. 
 
-We can enter psql and use `show data_directory` to show the directory Postgres uses to store databases physical files.
+To see the heap files we can use a few postgres internal tables to see where they're located in the disk. First, we can enter psql and use `show data_directory` to show the directory Postgres uses to store databases physical files.
 
 {{< highlight sql >}}
  show data_directory;
@@ -45,7 +48,7 @@ select relfilenode from pg_class where relname = 'foo';                 
        71123
 {{< / highlight >}}
 
-Then we can check the file on disk by running this command in the shell (ls $PGDATA/base/<database_oid>/<table_oid>):
+Finally, we can check the file on disk by running this command in the shell (ls $PGDATA/base/<database_oid>/<table_oid>):
 
 {{< highlight bash >}}
 
@@ -53,7 +56,6 @@ ls -lrt /opt/homebrew/var/postgresql@16/base/71122/71123
 -rw-------  1 dlt  admin  0 16 Aug 14:20 /opt/homebrew/var/postgresql@16/base/71122/71123
 
 {{< / highlight >}}
-
 
 The file has size 0 because we haven't done any INSERTs in this table yet.
 
@@ -148,7 +150,6 @@ If we use `\di+` to show the indexes in our database we can see that the index w
 
 {{< / highlight >}}
 ## Costs associated with indexes
-
 It is important to highlight that the extra speed brought by indices is associated with several costs that must be considered when deciding where and how to apply them.
 
 ### Disk Space
@@ -161,7 +162,7 @@ Also, there is a maintenance cost in writing operations such as UPDATE, INSERT a
 The query planner (also known as query optimizer) is the component responsible for determining the best execution strategy for a query. With more indexes available, the query planner has more options to consider, which can increase the time needed to plan the query, especially in systems with many complex queries or where there are many indexes available. 
 
 ### Memory usage
-PostgreSQL maintains a portion of frequently accessed data and index pages in memory in its shared buffers. When an index is used, the relevant index pages are loaded into shared buffers to speed up access. The more indexes you have and the more they are used, the more shared buffer memory is necessary. Since shared buffers are limited and are also used for caching data pages, filling the shared buffers with indexes can lead to less efficient caching of table data.
+PostgreSQL maintains a portion of frequently accessed data and index pages in memory in its shared buffers. When an index is used, the relevant index pages are loaded into shared buffers to speed up access. The more indexes you have and the more they are used, the more shared buffer memory is necessary. Since shared buffers are limited and are also used for caching data pages, filling the shared buffers with indexes can lead to less efficient caching of table data. It's also good to keep in mind that the whole indexed column is copied in every node of the btree, since there's a limit in node size capacity, the larger the indexed column the deeper the tree will be.
 
 Another aspect of memory usage is that PostgreSQL uses work memory when it executes queries that involves sorting or complex index scans (involving multi-column or covering indexes). Larger indexes require more memory for these operations. Also, indexes require memory to store some metadata about their structure, column names and statistics in the system catalog cache. And finally indexes require memory for maintainance operations like vacuuming and reindexing operations.
 

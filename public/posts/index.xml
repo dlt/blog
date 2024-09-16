@@ -13,7 +13,7 @@
       <link>https://example.org/posts/introduction-to-postgresql-indexes/</link>
       <pubDate>Wed, 11 Sep 2024 12:07:51 +0400</pubDate>
       <guid>https://example.org/posts/introduction-to-postgresql-indexes/</guid>
-      <description>Basics Indexes are special database objects primarily designed to increase the speed of data access, by allowing the database to read less data from the disk. They can also be used to enforce constraints like primary keys, unique keys and exclusion. Indexes are important for performance but do not speedup a query unless the query matches the columns and data types in the index. Also, as a very rough rule of thumb, an index will only help if less than 15-20% of the table will be returned in he query, otherwise the query planner might prefer a sequential scan.</description>
+      <description>Who&amp;rsquo;s this for This text is for developers that have an intuitive knowledge of what database indexes are, but don&amp;rsquo;t necessarily know how they work internaly, what are the tradeoffs associated with indexes, what are the types of indexes provided by postgres and how you can use some of its more advanced options to make them more optimized for your use case.&#xA;Basics Indexes are special database objects primarily designed to increase the speed of data access, by allowing the database to read less data from the disk.</description>
     </item>
   </channel>
 </rss>
