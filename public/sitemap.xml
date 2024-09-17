@@ -2,17 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://example.org/</loc>
+    <loc>http://localhost:51594/</loc>
     <lastmod>2024-09-11T12:07:51+04:00</lastmod>
   </url><url>
-    <loc>https://example.org/posts/introduction-to-postgresql-indexes/</loc>
+    <loc>http://localhost:51594/posts/introduction-to-postgresql-indexes/</loc>
     <lastmod>2024-09-11T12:07:51+04:00</lastmod>
   </url><url>
-    <loc>https://example.org/posts/</loc>
+    <loc>http://localhost:51594/posts/</loc>
     <lastmod>2024-09-11T12:07:51+04:00</lastmod>
   </url><url>
-    <loc>https://example.org/categories/</loc>
+    <loc>http://localhost:51594/categories/</loc>
   </url><url>
-    <loc>https://example.org/tags/</loc>
+    <loc>http://localhost:51594/tags/</loc>
   </url>
 </urlset>

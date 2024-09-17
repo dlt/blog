@@ -1,4 +1,9 @@
 baseURL = 'https://example.org/'
 languageCode = 'en-us'
 title = ''
-theme = 'ananke'
+theme = 'hello-friend-ng'
+[markup]
+[markup.tableOfContents]
+endLevel = 3
+ordered = false
+startLevel = 2

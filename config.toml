@@ -12,6 +12,7 @@ googleAnalytics = "Your Google Analytics tracking id"
 enableGitInfo = true
 
 paginate = 10
+theme = "hello-friend-ng"
 
 [params]
 # Hide the date on posts
