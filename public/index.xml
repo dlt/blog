@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title></title>
-    <link>http://localhost:51594/</link>
+    <link>https://example.org/</link>
     <description>Recent content on </description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 11 Sep 2024 12:07:51 +0400</lastBuildDate>
-    <atom:link href="http://localhost:51594/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://example.org/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Introduction to PostgreSQL Indexes</title>
-      <link>http://localhost:51594/posts/introduction-to-postgresql-indexes/</link>
+      <link>https://example.org/posts/introduction-to-postgresql-indexes/</link>
       <pubDate>Wed, 11 Sep 2024 12:07:51 +0400</pubDate>
-      <guid>http://localhost:51594/posts/introduction-to-postgresql-indexes/</guid>
+      <guid>https://example.org/posts/introduction-to-postgresql-indexes/</guid>
       <description>Who&amp;rsquo;s this for Basics How data is stored in disk How indexes speedup access to data Costs associated with indexes Disk Space Write operations Query planner Memory usage Types of Indexes Btree Hash BRIN GIN GiST &amp;amp; SP-GiST Conclusion Who&amp;rsquo;s this for This text is for developers that have an intuitive knowledge of what database indexes are, but don&amp;rsquo;t necessarily know how they work internaly, what are the tradeoffs associated with indexes, what are the types of indexes provided by postgres and how you can use some of its more advanced options to make them more optimized for your use case.</description>
     </item>
   </channel>

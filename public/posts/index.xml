@@ -1,19 +1,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Posts on </title>
-        <link>http://localhost:51594/posts/</link>
+        <link>https://example.org/posts/</link>
         <description>Recent content in Posts on </description>
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
         <lastBuildDate>Wed, 11 Sep 2024 12:07:51 +0400</lastBuildDate>
-        <atom:link href="http://localhost:51594/posts/index.xml" rel="self" type="application/rss+xml" />
+        <atom:link href="https://example.org/posts/index.xml" rel="self" type="application/rss+xml" />
         
         <item>
             <title>Introduction to PostgreSQL Indexes</title>
-            <link>http://localhost:51594/posts/introduction-to-postgresql-indexes/</link>
+            <link>https://example.org/posts/introduction-to-postgresql-indexes/</link>
             <pubDate>Wed, 11 Sep 2024 12:07:51 +0400</pubDate>
             
-            <guid>http://localhost:51594/posts/introduction-to-postgresql-indexes/</guid>
+            <guid>https://example.org/posts/introduction-to-postgresql-indexes/</guid>
             <description>Who&amp;rsquo;s this for Basics How data is stored in disk How indexes speedup access to data Costs associated with indexes Disk Space Write operations Query planner Memory usage Types of Indexes Btree Hash BRIN GIN GiST &amp;amp; SP-GiST Conclusion Who&amp;rsquo;s this for This text is for developers that have an intuitive knowledge of what database indexes are, but don&amp;rsquo;t necessarily know how they work internaly, what are the tradeoffs associated with indexes, what are the types of indexes provided by postgres and how you can use some of its more advanced options to make them more optimized for your use case.</description>
             <content type="html"><![CDATA[<nav id="TableOfContents">
   <ul>
@@ -248,7 +248,7 @@ For a in-depth analysis of how hash indexes fare in relation to btree, check Evg
 <h3 id="gist--sp-gist">GiST &amp; SP-GiST</h3>
 <p>The Generalized Search Tree and the Space-Partitioned Generalized Search Tree are tree structures that can be use as a base template to implement indexes for specific data types. You can think of them as framework for building indexes. The GiST is a balanced tree and the SP-GiST allow for the development of non-balanced data structures. They are useful for indexing points and geometric types, inet, ranges and text vectors. You can find an <a href="https://www.postgresql.org/docs/16/gist-builtin-opclasses.html">extensive list</a> of the built-in strategies shipped with postgres in the official documentation. If you need an index to enable full-text search in your application, you&rsquo;ll have to choose between GIN and GiST. Roughly speaking, GIN is faster for lookups but it&rsquo;s bigger and has greater building and maintainance costs. So the right index type for you will depend on your application requirements.</p>
 <h2 id="conclusion">Conclusion</h2>
-<p>Understanding and effectively using indexes is crucial for optimizing database performance in PostgreSQL. While indexes can greatly speed up query execution and improve overall efficiency, it&rsquo;s important to be mindful of their impact on write operations and storage. By carefully selecting the appropriate types of indexes based on your specific use cases you can ensure that your PostgreSQL database remains both fast and efficient. I hope this article thaught you at least one thing you didn&rsquo;t know about indexes, and that it was as fun and informative for you to read it as it was for me to write it.</p>
+<p>Understanding and effectively using indexes is crucial for optimizing database performance in PostgreSQL. While indexes can greatly speed up query execution and improve overall efficiency, it&rsquo;s important to be mindful of their impact on write operations and storage. By carefully selecting the appropriate types of indexes based on your specific use cases you can ensure that your PostgreSQL database remains both fast and efficient. I hope this article taught you at least one or two things you didn&rsquo;t know about Postgres indexes, and that you&rsquo;re better equiped to deal with different scenarios involving databases from now on.</p>
 ]]></content>
         </item>
         
