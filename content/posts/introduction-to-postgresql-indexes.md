@@ -179,7 +179,7 @@ select * from users where age = 30 and login_count = 100;
 
 If the `age` and `login_count` columns are indexed, postgres scans index `age` for all pages with `age=30` and makes a bitmap where the pages that might contain rows with `age=30` are true. In a similar way, it builds a bitmap using the `login_count` index. It then ANDs the two bitmaps to form a third bitmap, and performs a table scan, only reading the pages that might contain candidate values, and only adding the rows where `age=30 and login_count=100` to the result set.
 #### Multi-column indexes
-Multi-column indexes are an alternative for using multiple indexes. They're generaly going to be smaller and faster than using multiple indexes, but they'll also be less flexible. That's because the order of the columns matter, because the database can search for a subset of the indexed columns, as long as they are the leftmost columns. For example, if you have an index on column `a` and another index on column `b`, these indexes will serve all the of queries below:
+Multi-column indexes are an alternative for using multiple indexes. They're generally going to be smaller and faster than using multiple indexes, but they'll also be less flexible. That's because the order of the columns matter, because the database can search for a subset of the indexed columns, as long as they are the leftmost columns. For example, if you have an index on column `a` and another index on column `b`, these indexes will serve all the of queries below:
 
 {{< highlight sql >}}
 select * from my_table where a = 42 and b = 420;
