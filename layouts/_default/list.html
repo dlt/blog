@@ -1,0 +1,30 @@
+{{ define "main" }}
+    {{ $paginator := .Paginate .Data.Pages }}
+
+    <main class="home">
+        <nav class="post-nav">
+            <a href="{{ "/" | relURL }}">← Dalto Curvelano</a>
+        </nav>
+
+        <section class="writing">
+            <h2 class="section-title">{{ .Title }}</h2>
+
+            {{ range $paginator.Pages.GroupByDate "2006" }}
+                <div class="posts-group">
+                    <div class="post-year">{{ .Key }}</div>
+                    <ul class="posts-list">
+                        {{ range .Pages }}
+                            <li class="post-item">
+                                <a href="{{.Permalink}}" class="post-item-inner">
+                                    <span class="post-title">{{.Title}}</span>
+                                    <span class="post-day">{{ .Date.Format "Jan 2"}}</span>
+                                </a>
+                            </li>
+                        {{ end }}
+                    </ul>
+                </div>
+            {{ end }}
+            {{ partial "pagination-list.html" . }}
+        </section>
+    </main>
+{{ end }}
