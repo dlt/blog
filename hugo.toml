@@ -1,7 +1,14 @@
 baseURL = 'https://example.org/'
 languageCode = 'en-us'
-title = ''
+title = 'explain, analyze'
 theme = 'hello-friend-ng'
+
+[params]
+customCSS = ["/css/custom.css"]
+
+[params.Logo]
+logoText = "explain, analyze"
+
 [markup]
 [markup.tableOfContents]
 endLevel = 3

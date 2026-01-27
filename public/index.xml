@@ -1,19 +1,33 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title></title>
-    <link>https://example.org/</link>
-    <description>Recent content on </description>
+    <title>explain, analyze</title>
+    <link>http://localhost:1313/</link>
+    <description>Recent content on explain, analyze</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 11 Sep 2024 12:07:51 +0400</lastBuildDate>
-    <atom:link href="https://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Introduction to PostgreSQL Indexes</title>
-      <link>https://example.org/posts/introduction-to-postgresql-indexes/</link>
+      <link>http://localhost:1313/posts/introduction-to-postgresql-indexes/</link>
       <pubDate>Wed, 11 Sep 2024 12:07:51 +0400</pubDate>
-      <guid>https://example.org/posts/introduction-to-postgresql-indexes/</guid>
-      <description>Who&amp;rsquo;s this for Basics How data is stored in disk How indexes speedup access to data Costs associated with indexes Disk Space Write operations Query planner Memory usage Types of Indexes Btree Hash BRIN GIN GiST &amp;amp; SP-GiST Conclusion Who&amp;rsquo;s this for This text is for developers that have an intuitive knowledge of what database indexes are, but don&amp;rsquo;t necessarily know how they work internaly, what are the tradeoffs associated with indexes, what are the types of indexes provided by postgres and how you can use some of its more advanced options to make them more optimized for your use case.</description>
+      <guid>http://localhost:1313/posts/introduction-to-postgresql-indexes/</guid>
+      <description>&lt;nav id=&#34;TableOfContents&#34;&gt;&#xA;  &lt;ul&gt;&#xA;    &lt;li&gt;&lt;a href=&#34;#whos-this-for&#34;&gt;Who&amp;rsquo;s this for&lt;/a&gt;&lt;/li&gt;&#xA;    &lt;li&gt;&lt;a href=&#34;#basics&#34;&gt;Basics&lt;/a&gt;&#xA;      &lt;ul&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#how-data-is-stored-in-disk&#34;&gt;How data is stored in disk&lt;/a&gt;&lt;/li&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#how-indexes-speedup-access-to-data&#34;&gt;How indexes speedup access to data&lt;/a&gt;&lt;/li&gt;&#xA;      &lt;/ul&gt;&#xA;    &lt;/li&gt;&#xA;    &lt;li&gt;&lt;a href=&#34;#costs-associated-with-indexes&#34;&gt;Costs associated with indexes&lt;/a&gt;&#xA;      &lt;ul&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#disk-space&#34;&gt;Disk Space&lt;/a&gt;&lt;/li&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#write-operations&#34;&gt;Write operations&lt;/a&gt;&lt;/li&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#query-planner&#34;&gt;Query planner&lt;/a&gt;&lt;/li&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#memory-usage&#34;&gt;Memory usage&lt;/a&gt;&lt;/li&gt;&#xA;      &lt;/ul&gt;&#xA;    &lt;/li&gt;&#xA;    &lt;li&gt;&lt;a href=&#34;#types-of-indexes&#34;&gt;Types of Indexes&lt;/a&gt;&#xA;      &lt;ul&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#btree&#34;&gt;Btree&lt;/a&gt;&lt;/li&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#hash&#34;&gt;Hash&lt;/a&gt;&lt;/li&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#brin&#34;&gt;BRIN&lt;/a&gt;&lt;/li&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#gin&#34;&gt;GIN&lt;/a&gt;&lt;/li&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#gist--sp-gist&#34;&gt;GiST &amp;amp; SP-GiST&lt;/a&gt;&lt;/li&gt;&#xA;      &lt;/ul&gt;&#xA;    &lt;/li&gt;&#xA;    &lt;li&gt;&lt;a href=&#34;#conclusion&#34;&gt;Conclusion&lt;/a&gt;&lt;/li&gt;&#xA;  &lt;/ul&gt;&#xA;&lt;/nav&gt;&#xA;&#xA;&lt;h2 id=&#34;whos-this-for&#34;&gt;Who&amp;rsquo;s this for&lt;/h2&gt;&#xA;&lt;p&gt;This text is for developers that have an intuitive knowledge of what database indexes are, but don&amp;rsquo;t necessarily know how they work internaly, what are the tradeoffs associated with indexes, what are the types of indexes provided by postgres and how you can use some of its more advanced options to make them more optimized for your use case.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Introduction to PostgreSQL Indexes</title>
+      <link>http://localhost:1313/posts/introdu%C3%A7ao-a-indices-postgresql/</link>
+      <pubDate>Wed, 11 Sep 2024 12:07:51 +0400</pubDate>
+      <guid>http://localhost:1313/posts/introdu%C3%A7ao-a-indices-postgresql/</guid>
+      <description>&lt;nav id=&#34;TableOfContents&#34;&gt;&#xA;  &lt;ul&gt;&#xA;    &lt;li&gt;&lt;a href=&#34;#whos-this-for&#34;&gt;Who&amp;rsquo;s this for&lt;/a&gt;&lt;/li&gt;&#xA;    &lt;li&gt;&lt;a href=&#34;#conceitos-básicos&#34;&gt;Conceitos Básicos&lt;/a&gt;&#xA;      &lt;ul&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#como-os-dados-são-armazenados-em-disco&#34;&gt;Como os dados são armazenados em disco&lt;/a&gt;&lt;/li&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#como-os-índices-aceleram-o-acesso-aos-dados&#34;&gt;Como os índices aceleram o acesso aos dados&lt;/a&gt;&lt;/li&gt;&#xA;      &lt;/ul&gt;&#xA;    &lt;/li&gt;&#xA;    &lt;li&gt;&lt;a href=&#34;#custos-associados-a-índices&#34;&gt;Custos associados a índices&lt;/a&gt;&#xA;      &lt;ul&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#espaço-em-disco&#34;&gt;Espaço em disco&lt;/a&gt;&lt;/li&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#operações-de-escrita&#34;&gt;Operações de escrita&lt;/a&gt;&lt;/li&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#planejador-de-queries&#34;&gt;Planejador de queries&lt;/a&gt;&lt;/li&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#uso-de-memória&#34;&gt;Uso de memória&lt;/a&gt;&lt;/li&gt;&#xA;      &lt;/ul&gt;&#xA;    &lt;/li&gt;&#xA;    &lt;li&gt;&lt;a href=&#34;#tipos-de-índices&#34;&gt;Tipos de índices&lt;/a&gt;&#xA;      &lt;ul&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#btree&#34;&gt;Btree&lt;/a&gt;&lt;/li&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#hash&#34;&gt;Hash&lt;/a&gt;&lt;/li&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#brin&#34;&gt;BRIN&lt;/a&gt;&lt;/li&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#gin&#34;&gt;GIN&lt;/a&gt;&lt;/li&gt;&#xA;        &lt;li&gt;&lt;a href=&#34;#gist--sp-gist&#34;&gt;GiST &amp;amp; SP-GiST&lt;/a&gt;&lt;/li&gt;&#xA;      &lt;/ul&gt;&#xA;    &lt;/li&gt;&#xA;  &lt;/ul&gt;&#xA;&lt;/nav&gt;&#xA;&#xA;&lt;h2 id=&#34;whos-this-for&#34;&gt;Who&amp;rsquo;s this for&lt;/h2&gt;&#xA;&lt;p&gt;This text is for developers that have an intuitive knowledge of what database indexes are, but don&amp;rsquo;t necessarily know how they work internaly, what are the tradeoffs associated with indexes, what are the types of indexes provided by postgres and how you can use some of its more advanced options to make them more optimized for your use case.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>About</title>
+      <link>http://localhost:1313/about/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/about/</guid>
+      <description>&lt;p&gt;I&amp;rsquo;m a Backend Engineer with 15+ years of experience designing and managing high-volume backend systems.&lt;/p&gt;&#xA;&lt;p&gt;I&amp;rsquo;m particularly interested in PostgreSQL optimization, database performance tuning, and building systems that scale. My favorite languages are Ruby, Python, and Rust.&lt;/p&gt;&#xA;&lt;p&gt;Currently working at Paag.&lt;/p&gt;&#xA;&lt;h2 id=&#34;contact&#34;&gt;Contact&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://github.com/dlt&#34;&gt;GitHub&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://linkedin.com/in/daltojr&#34;&gt;LinkedIn&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
     </item>
   </channel>
 </rss>

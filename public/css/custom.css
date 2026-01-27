@@ -1,0 +1,482 @@
+/* ===========================================
+   Professional Blog - Custom Styles
+   =========================================== */
+
+/* Base typography improvements */
+body {
+  letter-spacing: normal;
+  line-height: 1.7;
+}
+
+/* ===========================================
+   HOMEPAGE
+   =========================================== */
+
+.home {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 80px 32px;
+}
+
+/* Hero section */
+.hero {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.hero-name {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+  letter-spacing: -0.02em;
+}
+
+.hero-title {
+  font-size: 1.25rem;
+  margin: 0;
+  opacity: 0.6;
+  font-weight: 400;
+}
+
+/* About section */
+.about {
+  margin-bottom: 2.5rem;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.about p {
+  margin: 0 0 0.75rem 0;
+}
+
+.about-current {
+  opacity: 0.7;
+  font-size: 1rem;
+}
+
+/* Links section */
+.links {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 4rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.link-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.625rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+/* Light mode link styles */
+.link-item {
+  background: #f5f5f5;
+  color: inherit;
+}
+
+.link-item:hover {
+  background: #e8e8e8;
+}
+
+@media (prefers-color-scheme: dark) {
+  .link-item {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .link-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+}
+
+[data-theme=dark] .link-item {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme=dark] .link-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.link-item svg {
+  opacity: 0.7;
+}
+
+/* Writing section */
+.writing {
+  border-top: 1px solid rgba(128, 128, 128, 0.2);
+  padding-top: 2.5rem;
+}
+
+.section-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.5;
+  margin: 0 0 2rem 0;
+}
+
+/* Posts list */
+.posts-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.post-year {
+  font-size: 0.8rem;
+  font-weight: 600;
+  opacity: 0.4;
+  margin-bottom: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.posts-group:first-child .post-year {
+  margin-top: 0;
+}
+
+.post-item {
+  margin: 0;
+}
+
+.post-item-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.post-item-inner:hover {
+  opacity: 0.6;
+}
+
+.post-item .post-title {
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.post-day {
+  opacity: 0.4;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===========================================
+   BLOG POST PAGE
+   =========================================== */
+
+.post {
+  max-width: 800px;
+  padding: 60px 32px;
+  margin: 0 auto;
+}
+
+/* Post navigation */
+.post-nav {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 3rem;
+}
+
+.post-nav a {
+  text-decoration: none;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.post-nav a:hover {
+  opacity: 1;
+}
+
+/* Post header */
+.post-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 1rem 0;
+  letter-spacing: -0.02em;
+}
+
+.post-title a {
+  text-decoration: none;
+}
+
+/* Post meta info */
+.post-info {
+  font-size: 0.85rem;
+  opacity: 0.6;
+  margin-top: 0;
+}
+
+.post-info p {
+  margin: 0.5rem 0;
+}
+
+.post-info svg {
+  width: 1em;
+  height: 1em;
+  opacity: 0.6;
+  vertical-align: -0.125em;
+  margin-right: 0.5rem;
+}
+
+/* Post content */
+.post-content {
+  margin-top: 3rem;
+  font-size: 1.0625rem;
+  line-height: 1.8;
+}
+
+.post-content p {
+  margin-bottom: 1.5rem;
+}
+
+/* Headings in content */
+.post-content h2 {
+  font-size: 1.5rem;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.post-content h3 {
+  font-size: 1.25rem;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.post-content h4 {
+  font-size: 1.1rem;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+/* Lists */
+.post-content ul,
+.post-content ol {
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+  margin-left: 0;
+}
+
+.post-content li {
+  margin-bottom: 0.5rem;
+  line-height: 1.7;
+}
+
+/* Links in content */
+.post-content a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  text-decoration-color: rgba(128, 128, 128, 0.4);
+  transition: text-decoration-color 0.2s ease;
+}
+
+.post-content a:hover {
+  text-decoration-color: currentColor;
+}
+
+/* Code */
+code {
+  font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.875em;
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  background: rgba(128, 128, 128, 0.1);
+}
+
+pre {
+  padding: 1.25rem 1.5rem;
+  margin: 2rem 0;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* Blockquotes */
+blockquote {
+  margin: 2rem 0;
+  padding: 1rem 1.5rem;
+  border-left: 3px solid rgba(128, 128, 128, 0.3);
+  font-style: italic;
+  opacity: 0.9;
+}
+
+blockquote::before {
+  display: none;
+}
+
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* Images */
+.post-content img {
+  border-radius: 8px;
+  margin: 2rem 0;
+}
+
+/* Horizontal rules */
+hr {
+  margin: 2.5rem 0;
+  border: none;
+  height: 1px;
+  background: rgba(128, 128, 128, 0.2);
+}
+
+/* Table of contents */
+#toc {
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin: 2rem 0;
+  background: rgba(128, 128, 128, 0.05);
+}
+
+.toc-title {
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
+}
+
+#toc nav ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+#toc nav li {
+  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+}
+
+#toc nav a {
+  text-decoration: none;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+#toc nav a:hover {
+  opacity: 1;
+}
+
+/* Tags */
+.post-info .tag {
+  display: inline-block;
+  margin-right: 0.5rem;
+  opacity: 0.7;
+}
+
+.post-info .tag::before {
+  content: "#";
+}
+
+/* ===========================================
+   RESPONSIVE
+   =========================================== */
+
+@media (max-width: 840px) {
+  .home {
+    padding: 60px 24px;
+  }
+
+  .hero-name {
+    font-size: 2rem;
+  }
+
+  .hero-title {
+    font-size: 1.1rem;
+  }
+
+  .about {
+    font-size: 1rem;
+  }
+
+  .links {
+    gap: 0.75rem;
+  }
+
+  .link-item {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.9rem;
+  }
+
+  .post {
+    padding: 40px 24px;
+  }
+
+  .post-title {
+    font-size: 1.75rem;
+  }
+
+  .post-content {
+    font-size: 1rem;
+  }
+
+  .post-content h2 {
+    font-size: 1.35rem;
+  }
+
+  .post-content h3 {
+    font-size: 1.15rem;
+  }
+
+  pre {
+    margin-left: -20px;
+    margin-right: -20px;
+    border-radius: 0;
+    padding: 1rem;
+  }
+}
+
+/* ===========================================
+   DARK MODE REFINEMENTS
+   =========================================== */
+
+@media (prefers-color-scheme: dark) {
+  code {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  #toc {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  blockquote {
+    border-left-color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+[data-theme=dark] code {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme=dark] #toc {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme=dark] blockquote {
+  border-left-color: rgba(255, 255, 255, 0.2);
+}
