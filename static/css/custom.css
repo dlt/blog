@@ -108,10 +108,20 @@ body {
   opacity: 0.7;
 }
 
+/* Navigation in list pages */
+.home .post-nav {
+  margin-bottom: 2rem;
+}
+
 /* Writing section */
 .writing {
   border-top: 1px solid rgba(128, 128, 128, 0.2);
   padding-top: 2.5rem;
+}
+
+.home .post-nav + .writing {
+  border-top: none;
+  padding-top: 0;
 }
 
 .section-title {

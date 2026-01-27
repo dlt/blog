@@ -1,19 +1,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Posts on explain, analyze</title>
-        <link>http://localhost:1313/posts/</link>
+        <link>//localhost:1313/posts/</link>
         <description>Recent content in Posts on explain, analyze</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
         <lastBuildDate>Wed, 11 Sep 2024 12:07:51 +0400</lastBuildDate>
-        <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+        <atom:link href="//localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
         
         <item>
             <title>Introduction to PostgreSQL Indexes</title>
-            <link>http://localhost:1313/posts/introduction-to-postgresql-indexes/</link>
+            <link>//localhost:1313/posts/introduction-to-postgresql-indexes/</link>
             <pubDate>Wed, 11 Sep 2024 12:07:51 +0400</pubDate>
             
-            <guid>http://localhost:1313/posts/introduction-to-postgresql-indexes/</guid>
+            <guid>//localhost:1313/posts/introduction-to-postgresql-indexes/</guid>
             <description>&lt;nav id=&#34;TableOfContents&#34;&gt;
   &lt;ul&gt;
     &lt;li&gt;&lt;a href=&#34;#whos-this-for&#34;&gt;Who&amp;rsquo;s this for&lt;/a&gt;&lt;/li&gt;
@@ -284,10 +284,10 @@ For a in-depth analysis of how hash indexes fare in relation to btree, check Evg
         
         <item>
             <title>Introduction to PostgreSQL Indexes</title>
-            <link>http://localhost:1313/posts/introdu%C3%A7ao-a-indices-postgresql/</link>
+            <link>//localhost:1313/posts/introdu%C3%A7ao-a-indices-postgresql/</link>
             <pubDate>Wed, 11 Sep 2024 12:07:51 +0400</pubDate>
             
-            <guid>http://localhost:1313/posts/introdu%C3%A7ao-a-indices-postgresql/</guid>
+            <guid>//localhost:1313/posts/introdu%C3%A7ao-a-indices-postgresql/</guid>
             <description>&lt;nav id=&#34;TableOfContents&#34;&gt;
   &lt;ul&gt;
     &lt;li&gt;&lt;a href=&#34;#whos-this-for&#34;&gt;Who&amp;rsquo;s this for&lt;/a&gt;&lt;/li&gt;

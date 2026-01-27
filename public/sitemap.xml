@@ -2,22 +2,23 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>http://localhost:1313/</loc>
+    <loc>//localhost:1313/</loc>
+    <lastmod>2026-01-27T14:21:48+04:00</lastmod>
+  </url><url>
+    <loc>//localhost:1313/posts/introduction-to-postgresql-indexes/</loc>
+    <lastmod>2024-09-20T13:37:45+04:00</lastmod>
+  </url><url>
+    <loc>//localhost:1313/posts/introdu%C3%A7ao-a-indices-postgresql/</loc>
     <lastmod>2024-09-11T12:07:51+04:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/introduction-to-postgresql-indexes/</loc>
-    <lastmod>2024-09-11T12:07:51+04:00</lastmod>
+    <loc>//localhost:1313/posts/</loc>
+    <lastmod>2024-09-20T13:37:45+04:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/introdu%C3%A7ao-a-indices-postgresql/</loc>
-    <lastmod>2024-09-11T12:07:51+04:00</lastmod>
+    <loc>//localhost:1313/about/</loc>
+    <lastmod>2026-01-27T14:21:48+04:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/</loc>
-    <lastmod>2024-09-11T12:07:51+04:00</lastmod>
+    <loc>//localhost:1313/categories/</loc>
   </url><url>
-    <loc>http://localhost:1313/about/</loc>
-  </url><url>
-    <loc>http://localhost:1313/categories/</loc>
-  </url><url>
-    <loc>http://localhost:1313/tags/</loc>
+    <loc>//localhost:1313/tags/</loc>
   </url>
 </urlset>

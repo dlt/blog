@@ -1,7 +1,9 @@
-baseURL = 'https://example.org/'
+baseURL = '/'
 languageCode = 'en-us'
 title = 'explain, analyze'
 theme = 'hello-friend-ng'
+enableGitInfo = true
+paginate = 10
 
 [params]
 customCSS = ["/css/custom.css"]
