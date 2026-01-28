@@ -5,6 +5,10 @@ theme = 'hello-friend-ng'
 enableGitInfo = true
 paginate = 10
 
+[services]
+[services.googleAnalytics]
+ID = 'G-0D68NNNB93'
+
 [params]
 customCSS = ["/css/custom.css"]
 
