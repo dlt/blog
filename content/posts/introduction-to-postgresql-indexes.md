@@ -190,7 +190,22 @@ select * from my_table where b = 99;
 
 {{< /highlight >}}
 
-On the other hand, only the first two queries would use an index if you created a multi-column index on (a, b) with a command like `create index on my_table(a, b)`; So, when building multi-column indexes choose the order of the columns well so that your index can be used by the most queries possible. 
+On the other hand, only the first two queries would use an index if you created a multi-column index on (a, b) with a command like `create index on my_table(a, b)`; So, when building multi-column indexes choose the order of the columns well so that your index can be used by the most queries possible.
+
+##### Skip Scan in PostgreSQL 18
+
+The limitation described above is valid up to PostgreSQL 17. Starting with PostgreSQL 18, the query optimizer includes a new feature called **skip scan** that allows using a composite index even when the query doesn't filter on the leftmost column.
+
+Skip scan works by "skipping" through the distinct values of the leading index column. For example, given an index on `(a, b)` and a query `WHERE b = 420`, PostgreSQL 18 can internally transform this into multiple searches like `WHERE a = N AND b = 420` for each distinct value of `a`, and combine the results.
+
+{{< highlight sql >}}
+-- With an index on (a, b), this query can now use the index in PostgreSQL 18:
+select * from my_table where b = 420;
+{{< /highlight >}}
+
+This optimization is most effective when the omitted column (the leading column) has **low cardinality** - that is, few distinct values. Common use cases include indexes like `(country, phone_number)` or `(car_maker, license_plate)`, where the first column has relatively few distinct values. In ideal scenarios, execution time can drop dramatically - from tens of milliseconds to less than 1 millisecond.
+
+Note that skip scan works automatically, without any configuration required. The planner analyzes table statistics and decides whether applying the optimization is the most efficient strategy.
 
 #### Partial indexes
 Partial indexes allow you to use a conditional expression to control what subset of rows will be indexed, this can bring you many benefits:
