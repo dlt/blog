@@ -193,7 +193,7 @@ select * from my_table where b = 99;
 A ordem das colunas de um índice composto afeta quais consultas podem ser otmizadas por ele. Uma analogia para seu funcionamento pode ser encontrada nas quase extintos catalogos telefônicos. Da mesma maneira que um catálogo é ordenado por sobrenome, nome. Um índice composto tem uma coluna primária e outra secundária. Por esta razão é impossível usar apenas a coluna secundária sem a primária, assim como em um catálogo telefônico é impossível procurar o telefone de uma pessoa sabendo apenas seu nome.
 
 
-![Catálogo Telefônico](/images/lista_telefonica.png)
+![Catálogo Telefônico](https://dlt.github.io/blog/images/lista_telefonica.png)
 
 
 Um índice composto criado pelo comando `create index my_index on my_table(a, b)`, só é capaz de filtrar  se ele também filtra pela coluna `a`. Exemplo:
