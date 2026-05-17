@@ -8,18 +8,31 @@ draft = true
 
 ## Introduction
 
-About a few months ago I wrote my own error tracking Rails engine. I wanted something very simple and Rails only, something that would be enough for my side projects, and that at the same time would give me power to change it whenever I wanted. And would save me the hassle or the costs of installing trial version of Sentry or other similar tools.
+"Are there any recent errors in production?"
 
-So this post is about my journey writing this tool, what feature it has, and how it evolves to MCP powered error tracking Rails engine. it has the basics of what you would expect from error tracking engine. You can see graphs with historical with the history of exceptions, you can dig into some exception details and see what was the cause, you can see what was the how the stack trace looked at the moment of the exception. The moment the exception was raised, you can mark them as solved, ignored, etc.
+"Let's triage the unresolved errors."
 
- It also has notifier so you can be notified via Slack, Telegram, Discord, or email. It seamlessly integrates with Rails. you don't need to do anything to track errors on Rails application. And it also has helpers in order to capture errors from async jobs.You can see what's going on. It has it's good for debugging. You can see what was the stack trace at the moment or at the moment where the exception was raised. It has GitHub integration, so it's very easy to open issues associated with exceptions.  
+"Ignore all Stripe errors."
 
-Recently I've been including other features on it, so it has a basic APM for inspecting the application performance. You can see the average, the P ninety nine of endpoints, check how many queries were executed against the database, and even flame graphs for the slowest parts of the code base.
+"Investigate the error #13 and write a test that reproduces it."
 
-And I also wrote MCP server and Claude Code plugin. So when I need to work with this gem, for example, if I want to triage bugs, if I want to debug something specific, like checking the application performance, I can just write to my coding agent and it will get me this information. I don't need to log into the application anymore in order to check these things, and also I don't need to do some copy pasting in order to debug or work on some specific error. Before this feature, I used to go into the application and copy the stack traces and error messages and copy it back to the to the coding agent to s like give it some context on what's was happening to some error, but now I can like it can get everything using the MCP server and cloud code plugin.
+These are all prompts my coding agent understands when I work on projects that use Faultline.
 
+About a few months ago I wrote my own error tracking Rails engine. I wanted something simple and Rails only, something that would be enough for my side projects, and that at the same time would give me power to change it whenever I wanted. And would save me the hassle or the costs of installing a trial version of Sentry or other similar tools.
 
-I wrote the MCP service and exposed it via HTTP via a token that you can generate and then use when you're configuring the cloud plugin. And it has functions. It has tools to either list things, get more information regarding a specific exception, or to make like destructive actions on the server, like updates, resolving changing statuses, or even creating GitHub issues.
+This post is about my journey writing this tool, the motivations behind its set of features, and how it evolved to an MCP-powered error tracking Rails engine. It all started when I felt the need to have better observability around errors and performance issues on a side project I was working on. I wanted something that had more or less the same capabilities of a tool like Sentry, i.e. getting notified whenever an error occurs in production and having enough context in order to investigate the root cause and provide a fix. I also wanted something that was simple and seamlessly integrated on any Rails application. 
+
+It has the basics of what you would expect from an error tracking engine. You can see graphs with the history of exceptions, you can dig into some exception details and see what the cause was, you can see how the stack trace looked and inspect variables at raise point.
+
+<screenshot:raise_point.png>
+
+It also has a notifier so you can be notified via Slack, Telegram, Discord, or email. It seamlessly integrates with Rails. You don't need to do anything to track errors on a Rails application. And it also has helpers in order to capture errors from async jobs. It's also possible to see what the stack trace was at the moment the exception was raised. It has GitHub integration, so it takes one click to open issues for the tracked exceptions.  
+
+It comes with an APM module for inspecting the application performance. It provides average time spent in ms, number of queries executed against the database, and even flame graphs for the slowest parts of the code base.
+
+The gem also includes an MCP server and Claude Code plugin. Now, if I want to triage bugs or check how the application is performing, I can just write to my coding agent instead of logging into the application, avoiding tedious copy pasting and context-switching. Before this feature, I used to go into the application error dashboard and copy the stack traces and error messages into the coding agent.
+
+I wrote the MCP service and exposed it via HTTP, authenticated with a token that you can generate and then use when you're configuring the cloud plugin. It has tools to either list things, get more information regarding a specific exception, or to make destructive actions on the server, like updates, resolving, changing statuses, or even creating GitHub issues.
 
 Here is a list of the available tools and their description:
 
@@ -40,7 +53,7 @@ Here is a list of the available tools and their description:
   - bulk_update_error_groups — apply resolve / unresolve / ignore / delete to many ids in one call
   - create_github_issue — open a GitHub issue from a group (also requires github_configured?)
 
-That I created the skills that can manipulate the stools and this is a list of them.
+Then I created the skills that can manipulate the tools, and this is a list of them.
 
   Browse / investigate
   - recent — list recent unresolved errors
@@ -63,6 +76,5 @@ That I created the skills that can manipulate the stools and this is a list of t
   Integrations
   - file-issue — open a GitHub issue from a group's most recent occurrence
 
- The MCP plus plug-in combo allows me to ask questions to the coding agents such as when was the what are the most recent errors? Help me to triage them. Help me to debug a specific error. How's the application performance going recently? Please resolve all bugs related to four or four errors.
 
-The tool for debugging a specific exception is particularly useful because it brings it takes the full exception and stack trace from the server. And since I'm already inside the project directory, it's very easy for the coding agent to relate the stack trace with the current codebase and propose a solution.
+The tool for debugging a specific exception is particularly useful because it takes the full exception and stack trace from the server. And since I'm already inside the project directory, it's very easy for the coding agent to relate the stack trace with the current codebase and propose a solution.
