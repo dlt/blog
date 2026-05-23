@@ -31,4 +31,6 @@ The tool for debugging a specific exception is useful because it pulls the full 
 
 Using the MCP server from the coding agent is great, but you don't need to limit yourself to just this use case. I've provided the MCP url and authentication token to my hermes agent and asked it to provide me with daily reports regarding my production bugs and application performance condition. The next logical step is going to make it open PR drafts with solutions for any new issues that arise.
 
+![hermes telegram](https://dlt.github.io/blog/images/hermes-telegram.jpg)
+
 If you try it out, open an issue or let me know how it goes. So far I've only run it on my own side projects, so I'm curious to see how the debug flow performs on something bigger.
