@@ -1,13 +1,10 @@
 +++
-title = 'MCP-Powered Error Tracking in Rails: Triage, Debugging and Profiling from your coding agent'
+title = 'MCP-Powered Error Tracking in Rails: Triage, Debugging and Profiling from Your Coding Agent'
 date = 2026-05-15T12:00:00+04:00
-draft = true
+draft = false
 +++
 
-![demo](/images/demo.gif)
-
-{{< toc >}}
-
+![demo](https://dlt.github.io/blog/images/demo.gif)
 
 "Are there any recent errors in production?"
 
@@ -22,8 +19,6 @@ These are all prompts my coding agent understands when I work on projects that u
 A few months ago I wrote my own error tracking Rails engine. It all started when I felt the need to have better observability around errors and performance issues on a side project I was working on. I wanted something that had more or less the same capabilities as a tool like Sentry, i.e. getting notified whenever an error occurs in production and having enough context to investigate the root cause and provide a fix. But I also wanted something simple, Rails only, and integrated into any Rails application. Something that would be enough for my side projects, would give me power to change it whenever I wanted, and would save me the hassle or the costs of installing a trial version of Sentry or other similar tools.
 
 It has the basics of what you would expect from an error tracking engine. You can see graphs with the history of exceptions, you can dig into some exception details and see what the cause was, you can see how the stack trace looked and inspect variables at raise point.
-
-<screenshot:raise_point.png>
 
 Notifications go out via Slack, Telegram, Discord, or email. No setup required on a Rails app. GitHub integration means one click opens an issue from any tracked exception. An APM module rounds it out: average time spent in ms, number of queries executed against the database, and flame graphs for the slowest parts of the codebase. All of which is table-stakes. Sentry has been doing it for decades.
 
