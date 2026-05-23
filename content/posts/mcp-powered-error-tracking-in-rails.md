@@ -14,7 +14,7 @@ draft = false
 
 "Investigate the error #13 and write a test that reproduces it."
 
-These are all prompts my coding agent understands when I work on projects that use Faultline.
+These are all prompts my coding agent understands when I work on projects that use [Faultline](https://github.com/dlt/faultline).
 
 A few months ago I wrote my own error tracking Rails engine. It all started when I felt the need to have better observability around errors and performance issues on a side project I was working on. I wanted something that had more or less the same capabilities as a tool like Sentry, i.e. getting notified whenever an error occurs in production and having enough context to investigate the root cause and provide a fix. But I also wanted something simple, Rails only, and integrated into any Rails application. Something that would be enough for my side projects, would give me power to change it whenever I wanted, and would save me the hassle or the costs of installing a trial version of Sentry or other similar tools.
 
