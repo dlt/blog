@@ -33,7 +33,7 @@ With each iteration I built a small feature or corrected a small bug, and then o
 
 ## Under the hood
 
-The architecture is quite simple. An async Tokio event loop triggers at regular intervals and queries the catalog tables for the desired information. This is printed in the form of tables and graphs on the terminal using the ratatui library.
+The architecture consists of an async Tokio event loop that triggers at regular intervals. At each interval several queries run against the catalog tables, and their results are aggregated in a [PgSnapshot](https://github.com/dlt/pg_glimpse/blob/main/src/db/models.rs#L323) struct. This struct is printed in the form of tables and graphs on the terminal using the ratatui library.
 
 The tests are supported by a Rust crate called "insta". This crate is responsible for snapshot testing. Text representations of the UI are saved in snapshots and the unit tests make assertions based on them.
 
