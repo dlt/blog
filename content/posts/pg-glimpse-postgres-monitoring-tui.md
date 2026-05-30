@@ -8,7 +8,23 @@ draft = false
 
 ## pg_glimpse
 
-A recent project that I'm proud of is pg_glimpse. It is a TUI Postgres monitoring application. Think of pg_activity, with a slicker UI and a few extra tools. Before I built this tool I was constantly using ad hoc queries to monitor production databases. Now I have something that fits very well in my terminal-based workflow. It started as a proof of concept I built with Claude Code in a couple of afternoons, and later developed into a full monitoring TUI application. It can be used to monitor indexes, tables, replication and vacuum stats, wait events, transaction wraparound, and more. It's also possible to record the statistics collected during a monitoring session and replay them later, so that you can better understand what happened during an incident. During the development of this tool I learned not only more about Postgres internal catalog tables, but also how to steer a coding agent to produce a useful tool while maintaining a high bar for codebase quality. I also learned a bit more about Rust async. I've been doing Rust for less than a year.
+pg_glimpse is a TUI Postgres monitoring application. Think of pg_activity, with a slicker UI and a few extra tools. Before I built this tool I was constantly using ad hoc queries to monitor production databases. Now I have something that fits very well in my terminal-based workflow. It started as a proof of concept I built with Claude Code in a couple of afternoons, and grew from there.
+
+It covers:
+
+  - Active queries with wait events
+  - Lock blocking chains
+  - Table and index stats (bloat, sizes, scans, dead tuples)
+  - Replication lag
+  - Live vacuum progress
+  - Transaction wraparound risk
+  - pg_stat_statements metrics
+  - WAL rate and checkpoint stats
+  - Sparkline graphs for connections, TPS, cache hit ratio, query times, and locks
+
+It automatically records the statistics collected during a monitoring session, so you can replay them later to better understand what happened during an incident, or to share a session with a teammate.
+
+While developing pg_glimpse I learned not only more about Postgres internal catalog tables, but also how to steer a coding agent to produce a useful tool while maintaining a high bar for codebase quality. I also learned a bit more about Rust async, something I hadn't worked with before.
 
 ## Small iterations beat big prompts
 
