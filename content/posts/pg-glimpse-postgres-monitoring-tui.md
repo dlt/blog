@@ -8,7 +8,7 @@ draft = false
 
 ## pg_glimpse
 
-pg_glimpse is a TUI Postgres monitoring application. Think of pg_activity, with a slicker UI and a few extra tools. Before I built this tool I was constantly using ad hoc queries to monitor production databases. Now I have something that fits very well in my terminal-based workflow. It started as a proof of concept I built with Claude Code in a couple of afternoons, and grew from there.
+[pg_glimpse](https://github.com/dlt/pg_glimpse) is a TUI Postgres monitoring application. Think of pg_activity, with a slicker UI and a few extra tools. Before I built this tool I was constantly using ad hoc queries to monitor production databases. Now I have something that fits very well in my terminal-based workflow. It started as a proof of concept I built with Claude Code in a couple of afternoons, and grew from there.
 
 It covers:
 - Active queries with wait events
