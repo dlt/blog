@@ -29,6 +29,8 @@ While developing pg_glimpse I learned not only more about Postgres internal cata
 
 I built this project with heavy assistance from an AI-agent tool. It was one of the first projects I've built in this way. In my previous AI-assisted projects I was annoyed with the amount of low-quality code and bugs introduced by the coding agents. They required me to review the code and test it with extra care. I also had to constantly redefine prompts and reinforce project rules. So code quality and correctness were priorities for me. I wanted an experienced Rust programmer to look at the code and find no issues with its quality whatsoever. I developed the project in several small iterations. I wanted to have control of the output at the end of each step, rather than write a big prompt/plan and forget about it.
 
+With each iteration I built a small feature or corrected a small bug, and then opened up the application to see the results. This helped me to make sure that the changes I was making made sense, didn't introduce regressions and fit the UI. AI-assisted engineering frees up time to wear your QA or product hat. Start small, and iterate on feedback quickly.
+
 ## Under the hood
 
 The architecture is quite simple. An async Tokio event loop triggers at regular intervals and queries the catalog tables for the desired information. This is printed in the form of tables and graphs on the terminal using the ratatui library.
