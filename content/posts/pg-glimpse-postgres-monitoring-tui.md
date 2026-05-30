@@ -11,6 +11,7 @@ draft = false
 [pg_glimpse](https://github.com/dlt/pg_glimpse) is a TUI Postgres monitoring application. Think of pg_activity, with a slicker UI and a few extra tools. Before I built this tool I was constantly using ad hoc queries to monitor production databases. Now I have something that fits very well in my terminal-based workflow. It started as a proof of concept I built with Claude Code in a couple of afternoons, and grew from there.
 
 It covers:
+
 - Active queries with wait events
 - Lock blocking chains
 - Table and index stats (bloat, sizes, scans, dead tuples)
@@ -27,7 +28,7 @@ While developing pg_glimpse I learned not only more about Postgres internal cata
 
 ## Small iterations beat big prompts
 
-I built this project with heavy assistance from an AI-agent tool. It was one of the first projects I've built in this way. In my previous AI-assisted projects I was annoyed with the amount of low-quality code and bugs introduced by the coding agents. They required me to review the code and test it with extra care. I also had to constantly redefine prompts and reinforce project rules. So code quality and correctness were priorities for me. I wanted an experienced Rust programmer to look at the code and find no issues with its quality whatsoever. I developed the project in several small iterations. I wanted to have control of the output at the end of each step, rather than write a big prompt/plan and forget about it.
+I built this project with heavy assistance from an AI-agent tool. It was one of the first projects I built in this way. In my previous AI-assisted projects I was annoyed with the amount of low-quality code and bugs introduced by the coding agents. They required me to review the code and test it with extra care. I also had to constantly redefine prompts and reinforce project rules. So code quality and correctness were priorities for me. I wanted an experienced Rust programmer to look at the code and find no issues with its quality whatsoever. I developed the project in several small iterations. I wanted to have control of the output at the end of each step, rather than write a big prompt/plan and forget about it.
 
 With each iteration I built a small feature or corrected a small bug, and then opened up the application to see the results. This helped me to make sure that the changes I was making made sense, didn't introduce regressions and fit the UI. AI-assisted engineering frees up time to wear your QA or product hat. Start small, and iterate on feedback quickly.
 
