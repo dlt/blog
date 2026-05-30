@@ -11,7 +11,6 @@ draft = false
 pg_glimpse is a TUI Postgres monitoring application. Think of pg_activity, with a slicker UI and a few extra tools. Before I built this tool I was constantly using ad hoc queries to monitor production databases. Now I have something that fits very well in my terminal-based workflow. It started as a proof of concept I built with Claude Code in a couple of afternoons, and grew from there.
 
 It covers:
-
   - Active queries with wait events
   - Lock blocking chains
   - Table and index stats (bloat, sizes, scans, dead tuples)
@@ -28,7 +27,7 @@ While developing pg_glimpse I learned not only more about Postgres internal cata
 
 ## Small iterations beat big prompts
 
-I've built this project with heavy assistance from an AI-agent tool. It was one of the first projects I've built in this way. In my previous AI-assisted projects I was annoyed with the amount of low-quality code and bugs introduced by the coding agents. They required me to review the code and test it with extra care. I also had to constantly redefine prompts and reinforce project rules. So code quality and correctness were priorities for me. I wanted an experienced Rust programmer to look at the code and find no issues with its quality whatsoever. I developed the project in several small iterations. I wanted to have control of the output at the end of each step, rather than write a big prompt/plan and forget about it.
+I built this project with heavy assistance from an AI-agent tool. It was one of the first projects I've built in this way. In my previous AI-assisted projects I was annoyed with the amount of low-quality code and bugs introduced by the coding agents. They required me to review the code and test it with extra care. I also had to constantly redefine prompts and reinforce project rules. So code quality and correctness were priorities for me. I wanted an experienced Rust programmer to look at the code and find no issues with its quality whatsoever. I developed the project in several small iterations. I wanted to have control of the output at the end of each step, rather than write a big prompt/plan and forget about it.
 
 ## Under the hood
 
@@ -40,6 +39,8 @@ After the tool settled on its feature set, I wrote unit and integration tests fo
 
 ## Shipping
 
-After the refactoring was completed, I packaged it so that it could be installed via Homebrew, Cargo, and Scoop. It was also time to handle some issues, as well as some changes requested by the first users. They mostly revolved around compatibility with different OSes and Postgres cloud services.
+After the refactoring was completed, I packaged it so that it could be installed via Homebrew, Cargo, and Scoop. It was also time to handle some issues, as well as some changes requested by the first users. They mostly revolved around compatibility with different OSes, Postgres versions and cloud services.
+
+The lesson I keep coming back to: small iterations beat big prompts. Reviewing one diff at a time keeps the quality bar high without slowing things down much, and that's what made the difference on this one. This is why I don't fully trust Ralph loops, or /goal yet.
 
 The tool's source code and installation instructions can be found in the [GitHub repository](https://github.com/dlt/pg_glimpse).
