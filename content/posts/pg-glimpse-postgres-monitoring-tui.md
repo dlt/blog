@@ -8,7 +8,7 @@ draft = false
 
 ## pg_glimpse
 
-[pg_glimpse](https://github.com/dlt/pg_glimpse) is a TUI Postgres monitoring application. Think of pg_activity, with a slicker UI and a few extra tools. Before I built this tool I was constantly using ad hoc queries to monitor production databases. Now I have something that fits very well in my terminal-based workflow. It started as a proof of concept I built with Claude Code in a couple of afternoons, and grew from there.
+[pg_glimpse](https://github.com/dlt/pg_glimpse) is a TUI Postgres monitoring application. Think of pg_activity, with a slicker UI and a few extra tools. Before I built this tool I was constantly using ad hoc queries to monitor production databases. Now I have something that fits in my terminal-based workflow. It started as a proof of concept I built with Claude Code in a couple of afternoons, and grew from there.
 
 It covers:
 
@@ -42,7 +42,7 @@ After the tool settled on its feature set, I wrote unit and integration tests fo
 
 ## Shipping
 
-After the refactoring was completed, I packaged it so that it could be installed via Homebrew, Cargo, and Scoop. It was also time to handle some issues, as well as some changes requested by the first users. They mostly revolved around compatibility with different OSes, Postgres versions and cloud services.
+After the refactoring was completed, I packaged it so that it could be installed via Homebrew, Cargo, and Scoop. It was also time to handle some issues, as well as some changes requested by the first users. They mostly revolved around compatibility with different OSes, Postgres versions, and cloud services.
 
 The lesson I keep coming back to: small iterations beat big prompts. Reviewing one diff at a time keeps the quality bar high without slowing things down much, and that's what made the difference on this one. This is why I don't fully trust Ralph loops, or /goal yet.
 
