@@ -1,5 +1,5 @@
 +++
-title = 'Small Iterations Beat Big Prompts: Building pg_glimpse with an AI Agent'
+title = 'Building pg_glimpse: A Postgres Monitoring TUI'
 date = 2026-05-30T11:00:00+04:00
 draft = false
 +++
