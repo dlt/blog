@@ -1,0 +1,12 @@
+name = "explain, analyze"
+license = "MIT"
+licenselink = ""
+description = "Calm, dense, fast theme for technical writing. Terminal-prompt identity, monospace chrome, system-sans body, first-class code blocks, light/dark with no flash."
+homepage = ""
+demosite = ""
+tags = ["blog", "minimal", "dark mode", "code", "developer", "monospace"]
+features = ["dark mode", "syntax highlighting", "reading time", "git info", "rss"]
+min_version = "0.128.0"
+
+[author]
+  name = "Dalto Curvelano"

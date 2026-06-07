@@ -1,22 +1,50 @@
 baseURL = '/'
 languageCode = 'en-us'
 title = 'explain, analyze'
-theme = 'hello-friend-ng'
+theme = 'explain-analyze'
 enableGitInfo = true
 paginate = 10
 
+[author]
+  name = 'Dalto Curvelano'
+
 [services]
-[services.googleAnalytics]
-ID = 'G-0D68NNNB93'
+  [services.googleAnalytics]
+    ID = 'G-0D68NNNB93'
 
 [params]
-customCSS = ["/css/custom.css"]
+  author = 'Dalto Curvelano'
+  description = 'Notes on PostgreSQL, backend systems, and database performance.'
+  subtitle = 'Notes on PostgreSQL and backend systems'
+  themeColor = '#14161b'
+  gitUrl = 'https://github.com/dlt/blog/commit/'
+  keywords = ['PostgreSQL', 'databases', 'backend', 'performance', 'Rust', 'Ruby', 'Go']
 
-[params.Logo]
-logoText = "explain, analyze"
+  [params.Logo]
+    logoText = 'explain, analyze'
+
+  [params.social]
+    github = 'https://github.com/dlt'
+    linkedin = 'https://linkedin.com/in/daltojr'
+
+[menus]
+  [[menus.main]]
+    name = 'posts'
+    url = '/posts/'
+    weight = 10
+  [[menus.main]]
+    name = 'about'
+    url = '/about/'
+    weight = 20
 
 [markup]
-[markup.tableOfContents]
-endLevel = 3
-ordered = false
-startLevel = 2
+  [markup.highlight]
+    noClasses = false
+    lineNumbersInTable = true
+    tabWidth = 2
+    guessSyntax = true
+    style = 'github'
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 3
+    ordered = false

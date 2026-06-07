@@ -1,0 +1,13 @@
+{{ $p := .Paginator }}
+{{ if or $p.HasPrev $p.HasNext }}
+  <nav class="list-pager" aria-label="Pagination">
+    {{ if $p.HasPrev }}
+      <a class="list-pager__item list-pager__item--prev" href="{{ $p.Prev.URL }}" rel="prev">&larr; {{ i18n "newerPosts" }}</a>
+    {{ else }}
+      <span></span>
+    {{ end }}
+    {{ if $p.HasNext }}
+      <a class="list-pager__item list-pager__item--next" href="{{ $p.Next.URL }}" rel="next">{{ i18n "olderPosts" }} &rarr;</a>
+    {{ end }}
+  </nav>
+{{ end }}

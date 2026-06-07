@@ -1,0 +1,16 @@
+<header class="site-header">
+  <div class="wrap site-header__inner">
+    <a class="brand" href="{{ .Site.Home.RelPermalink }}" aria-label="{{ .Site.Title }}, home">
+      <span class="brand__prompt" aria-hidden="true">&gt;</span>
+      <span class="brand__text">{{ or .Site.Params.Logo.logoText .Site.Title }}</span>
+      <span class="brand__cursor" aria-hidden="true"></span>
+    </a>
+
+    <nav class="site-nav" aria-label="Primary">
+      {{ range .Site.Menus.main }}
+        <a class="site-nav__link" href="{{ .URL | relLangURL }}"{{ if $.IsMenuCurrent "main" . }} aria-current="page"{{ end }}>{{ .Name }}</a>
+      {{ end }}
+      {{ partial "theme-toggle.html" . }}
+    </nav>
+  </div>
+</header>

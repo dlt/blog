@@ -1,0 +1,10 @@
+<footer class="site-footer">
+  <div class="wrap site-footer__inner">
+    <span class="site-footer__copy">&copy; {{ now.Format "2006" }} {{ or .Site.Params.author .Site.Author.name .Site.Title }}</span>
+    <span class="site-footer__links">
+      {{ with .OutputFormats.Get "rss" }}<a href="{{ .Permalink }}" rel="alternate" type="application/rss+xml">RSS</a>{{ end }}
+      {{ with .Site.Params.social.github }}<a href="{{ . }}" target="_blank" rel="noopener">GitHub</a>{{ end }}
+      {{ with .Site.Params.social.linkedin }}<a href="{{ . }}" target="_blank" rel="noopener">LinkedIn</a>{{ end }}
+    </span>
+  </div>
+</footer>

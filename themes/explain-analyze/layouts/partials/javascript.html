@@ -1,0 +1,12 @@
+{{ $scripts := slice }}
+{{ with resources.Get "js/theme.js" }}{{ $scripts = $scripts | append . }}{{ end }}
+{{ with resources.Get "js/copy.js" }}{{ $scripts = $scripts | append . }}{{ end }}
+
+{{ if $scripts }}
+  {{ $bundle := $scripts | resources.Concat "js/bundle.js" | minify | fingerprint "sha512" }}
+  <script src="{{ $bundle.RelPermalink }}" integrity="{{ $bundle.Data.Integrity }}" defer></script>
+{{ end }}
+
+{{ range $val := .Site.Params.customJS }}
+  {{ if gt (len $val) 0 }}<script src="{{ $val | relURL }}" defer></script>{{ end }}
+{{ end }}

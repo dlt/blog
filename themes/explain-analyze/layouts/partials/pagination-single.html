@@ -1,0 +1,16 @@
+{{ if and (not .Site.Params.DisableReadOtherPosts) (or .NextInSection .PrevInSection) }}
+  <nav class="post-pager" aria-label="{{ i18n "readOtherPosts" | default "More posts" }}">
+    {{ with .NextInSection }}
+      <a class="post-pager__item post-pager__item--prev" href="{{ .Permalink }}" rel="prev">
+        <span class="post-pager__dir">&larr; {{ i18n "newerPost" | default "Newer" }}</span>
+        <span class="post-pager__title">{{ .Title }}</span>
+      </a>
+    {{ end }}
+    {{ with .PrevInSection }}
+      <a class="post-pager__item post-pager__item--next" href="{{ .Permalink }}" rel="next">
+        <span class="post-pager__dir">{{ i18n "olderPost" | default "Older" }} &rarr;</span>
+        <span class="post-pager__title">{{ .Title }}</span>
+      </a>
+    {{ end }}
+  </nav>
+{{ end }}

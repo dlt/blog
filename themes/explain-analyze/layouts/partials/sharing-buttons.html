@@ -1,0 +1,5 @@
+{{/* Dormant unless params.EnableSharingButtons is set. Audience-relevant targets only. */}}
+<a class="share" href="https://news.ycombinator.com/submitlink?u={{ .Permalink }}&amp;t={{ .Title }}" target="_blank" rel="noopener" title="Share on Hacker News">HN</a>
+<a class="share" href="https://twitter.com/intent/tweet/?url={{ .Permalink }}&amp;text={{ .Title }}" target="_blank" rel="noopener" title="Share on X">X</a>
+<a class="share" href="https://www.linkedin.com/shareArticle?mini=true&amp;url={{ .Permalink }}&amp;title={{ .Title }}" target="_blank" rel="noopener" title="Share on LinkedIn">LinkedIn</a>
+<a class="share" href="mailto:?subject={{ .Title }}&amp;body={{ .Permalink }}" rel="noopener" title="Share via email">Email</a>

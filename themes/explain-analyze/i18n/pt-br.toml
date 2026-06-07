@@ -1,0 +1,48 @@
+# Portuguese (Brazil) UI strings
+
+[skipToContent]
+other = "Pular para o conteúdo"
+
+[toggleTheme]
+other = "Alternar tema de cor"
+
+[postAvailable]
+other = "Também disponível em"
+
+[home]
+other = "Início"
+
+[notFound]
+other = "Página não encontrada"
+
+[readingTime]
+one   = "Um minuto de leitura"
+other = "{{ .Count }} minutos de leitura"
+
+[wordCount]
+one   = "Uma palavra"
+other = "{{ .Count }} palavras"
+
+[tableOfContents]
+other = "Conteúdo"
+
+[lastModified]
+other = "Atualizado"
+
+[readOtherPosts]
+other = "Mais posts"
+
+[newerPost]
+other = "Mais recente"
+
+[olderPost]
+other = "Mais antigo"
+
+[newerPosts]
+other = "Posts mais recentes"
+
+[olderPosts]
+other = "Posts mais antigos"
+
+[writing]
+other = "Escrita"

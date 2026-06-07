@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.Language.Lang }}" data-theme>
+  <head>
+    {{ partial "head.html" . }}
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">{{ i18n "skipToContent" | default "Skip to content" }}</a>
+
+    {{ partial "header.html" . }}
+
+    <div id="main-content" tabindex="-1">
+      {{ block "main" . }}{{ end }}
+    </div>
+
+    {{ partial "footer.html" . }}
+
+    {{ partial "javascript.html" . }}
+  </body>
+</html>

@@ -1,0 +1,48 @@
+# English UI strings
+
+[skipToContent]
+other = "Skip to content"
+
+[toggleTheme]
+other = "Toggle color theme"
+
+[postAvailable]
+other = "Also available in"
+
+[home]
+other = "Home"
+
+[notFound]
+other = "Page not found"
+
+[readingTime]
+one   = "One minute read"
+other = "{{ .Count }} minute read"
+
+[wordCount]
+one   = "One word"
+other = "{{ .Count }} words"
+
+[tableOfContents]
+other = "Contents"
+
+[lastModified]
+other = "Updated"
+
+[readOtherPosts]
+other = "More posts"
+
+[newerPost]
+other = "Newer"
+
+[olderPost]
+other = "Older"
+
+[newerPosts]
+other = "Newer posts"
+
+[olderPosts]
+other = "Older posts"
+
+[writing]
+other = "Writing"
