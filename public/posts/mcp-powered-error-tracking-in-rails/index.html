@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en" data-theme>
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=58861&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('theme');
+      if (t !== 'light' && t !== 'dark') {
+        t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+
+
+  <title>MCP-Powered Error Tracking in Rails: Triage, Debugging and Profiling from Your Coding Agent :: explain, analyze</title>
+
+
+
+
+
+  
+
+
+
+<meta name="description" content="
+&ldquo;Are there any recent errors in production?&rdquo;
+&ldquo;Let&rsquo;s triage the unresolved errors.&rdquo;
+&ldquo;Ignore all Stripe errors.&rdquo;
+&ldquo;Investigate error #13 and write a test that reproduces it.&rdquo;
+These are all prompts my coding agent understands when I work on projects that use Faultline.
+A few months ago I wrote my own error tracking Rails engine. It all started when I felt the need to have better observability around errors and performance issues on a side project I was working on. I wanted something that had more or less the same capabilities as a tool like Sentry, i.e. getting notified whenever an error occurs in production and having enough context to investigate the root cause and provide a fix. But I also wanted something simple, Rails only, and integrated into any Rails application. Something that would be enough for my side projects, would give me the power to change it whenever I wanted, and would save me the hassle or the costs of installing a trial version of Sentry or other similar tools.">
+<meta name="author" content="Dalto Curvelano">
+<meta name="keywords" content="PostgreSQL, databases, backend, performance, Rust, Ruby, Go">
+<meta name="robots" content="noodp">
+<meta name="theme-color" content="#14161b">
+<link rel="canonical" href="//localhost:58861/posts/mcp-powered-error-tracking-in-rails/">
+
+
+
+  <style>:root{--bg:#ffffff;--bg-subtle:#f6f8fa;--fg:#1c1f26;--fg-muted:#586174;--border:#e4e7ec;--accent:#1d6fa5;--accent-fg:#ffffff;--prompt:#157347;--code-bg:#f6f8fa;--code-fg:#24292f;--selection:rgba(29,111,165,0.18);--font-sans:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;--font-mono:ui-monospace, SFMono-Regular, "SF Mono", "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;--wrap:46rem;--gap:1.5rem;--radius:6px;color-scheme:light}@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#14161b;--bg-subtle:#1b1e25;--fg:#e6e9ef;--fg-muted:#9aa4b2;--border:#272b34;--accent:#6cb6e8;--accent-fg:#0c0e12;--prompt:#46c08a;--code-bg:#1b1e25;--code-fg:#e6e9ef;--selection:rgba(108,182,232,0.22);color-scheme:dark}}[data-theme=dark]{--bg:#14161b;--bg-subtle:#1b1e25;--fg:#e6e9ef;--fg-muted:#9aa4b2;--border:#272b34;--accent:#6cb6e8;--accent-fg:#0c0e12;--prompt:#46c08a;--code-bg:#1b1e25;--code-fg:#e6e9ef;--selection:rgba(108,182,232,0.22);color-scheme:dark}*,*::before,*::after{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-sans);font-size:1.0625rem;line-height:1.65;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}::selection{background:var(--selection)}a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:2px}:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}.wrap{width:100%;max-width:var(--wrap);margin-inline:auto;padding-inline:1.25rem}.skip-link{position:absolute;left:.5rem;top:-3rem;z-index:100;background:var(--bg);color:var(--fg);border:1px solid var(--border);border-radius:var(--radius);padding:.5rem .75rem;font-family:var(--font-mono);font-size:.85rem;transition:top .15s ease}.skip-link:focus{top:.5rem}#main-content:focus{outline:none}.site-header{border-bottom:1px solid var(--border);background:var(--bg)}.site-header__inner{display:flex;align-items:center;justify-content:space-between;gap:var(--gap);min-height:3.5rem}.brand{display:inline-flex;align-items:baseline;gap:.4ch;font-family:var(--font-mono);font-weight:600;font-size:1rem;text-decoration:none;color:var(--fg);white-space:nowrap}.brand:hover{color:var(--fg)}.brand__prompt{color:var(--prompt);font-weight:700}.brand__cursor{display:inline-block;width:.55ch;height:1.05em;transform:translateY(.15em);background:var(--prompt);animation:ea-blink 1.1s steps(1)infinite}@keyframes ea-blink{50%{opacity:0}}.site-nav{display:flex;align-items:center;gap:1rem;font-family:var(--font-mono);font-size:.9rem}.site-nav__link{color:var(--fg-muted);text-decoration:none}.site-nav__link:hover,.site-nav__link[aria-current=page]{color:var(--fg)}.theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:2rem;height:2rem;padding:0;color:var(--fg-muted);background:0 0;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer}.theme-toggle:hover{color:var(--fg);border-color:var(--fg-muted)}.theme-toggle__moon{display:none}[data-theme=dark] .theme-toggle__sun{display:none}[data-theme=dark] .theme-toggle__moon{display:inline}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}</style>
+
+
+
+  
+  <link rel="stylesheet" href="/css/main.min.acb9c149a3428f3edf864706e4c62fbadba29b2fcd77dee2f84b8b614b9ec03e945724dddaa7d5dd0992a2469c83b5523415009c5234bccf29bf6e17dd4d0964.css" integrity="sha512-rLnBSaNCjz7fhkcG5MYvutuimy/Nd97i&#43;EuLYUuewD6UVyTd2qfV3QmSokacg7VSNBUAnFI0vM8pv24X3U0JZA==">
+
+
+
+
+
+  
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.e0a53d4cf14d6a5dc63fd245f7b2e50ce392395d70cecfb3fde244456df641c4.svg">
+
+
+
+
+  <meta itemprop="name" content="MCP-Powered Error Tracking in Rails: Triage, Debugging and Profiling from Your Coding Agent">
+  <meta itemprop="description" content="“Are there any recent errors in production?”
+“Let’s triage the unresolved errors.”
+“Ignore all Stripe errors.”
+“Investigate error #13 and write a test that reproduces it.”
+These are all prompts my coding agent understands when I work on projects that use Faultline.
+A few months ago I wrote my own error tracking Rails engine. It all started when I felt the need to have better observability around errors and performance issues on a side project I was working on. I wanted something that had more or less the same capabilities as a tool like Sentry, i.e. getting notified whenever an error occurs in production and having enough context to investigate the root cause and provide a fix. But I also wanted something simple, Rails only, and integrated into any Rails application. Something that would be enough for my side projects, would give me the power to change it whenever I wanted, and would save me the hassle or the costs of installing a trial version of Sentry or other similar tools.">
+  <meta itemprop="datePublished" content="2026-05-15T12:00:00+04:00">
+  <meta itemprop="dateModified" content="2026-05-23T13:30:40+04:00">
+  <meta itemprop="wordCount" content="581">
+<meta property="og:url" content="//localhost:58861/posts/mcp-powered-error-tracking-in-rails/">
+  <meta property="og:site_name" content="explain, analyze">
+  <meta property="og:title" content="MCP-Powered Error Tracking in Rails: Triage, Debugging and Profiling from Your Coding Agent">
+  <meta property="og:description" content="“Are there any recent errors in production?”
+“Let’s triage the unresolved errors.”
+“Ignore all Stripe errors.”
+“Investigate error #13 and write a test that reproduces it.”
+These are all prompts my coding agent understands when I work on projects that use Faultline.
+A few months ago I wrote my own error tracking Rails engine. It all started when I felt the need to have better observability around errors and performance issues on a side project I was working on. I wanted something that had more or less the same capabilities as a tool like Sentry, i.e. getting notified whenever an error occurs in production and having enough context to investigate the root cause and provide a fix. But I also wanted something simple, Rails only, and integrated into any Rails application. Something that would be enough for my side projects, would give me the power to change it whenever I wanted, and would save me the hassle or the costs of installing a trial version of Sentry or other similar tools.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-05-15T12:00:00+04:00">
+    <meta property="article:modified_time" content="2026-05-23T13:30:40+04:00">
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="MCP-Powered Error Tracking in Rails: Triage, Debugging and Profiling from Your Coding Agent">
+  <meta name="twitter:description" content="“Are there any recent errors in production?”
+“Let’s triage the unresolved errors.”
+“Ignore all Stripe errors.”
+“Investigate error #13 and write a test that reproduces it.”
+These are all prompts my coding agent understands when I work on projects that use Faultline.
+A few months ago I wrote my own error tracking Rails engine. It all started when I felt the need to have better observability around errors and performance issues on a side project I was working on. I wanted something that had more or less the same capabilities as a tool like Sentry, i.e. getting notified whenever an error occurs in production and having enough context to investigate the root cause and provide a fix. But I also wanted something simple, Rails only, and integrated into any Rails application. Something that would be enough for my side projects, would give me the power to change it whenever I wanted, and would save me the hassle or the costs of installing a trial version of Sentry or other similar tools.">
+
+
+
+
+  <meta property="article:published_time" content="2026-05-15T12:00:00&#43;04:00">
+
+
+
+  
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-0D68NNNB93"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-0D68NNNB93');
+        }
+      </script>
+
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <header class="site-header">
+  <div class="wrap site-header__inner">
+    <a class="brand" href="/" aria-label="explain, analyze, home">
+      <span class="brand__prompt" aria-hidden="true">&gt;</span>
+      <span class="brand__text">explain, analyze</span>
+      <span class="brand__cursor" aria-hidden="true"></span>
+    </a>
+
+    <nav class="site-nav" aria-label="Primary">
+      
+        <a class="site-nav__link" href="/posts/">posts</a>
+      
+        <a class="site-nav__link" href="/about/">about</a>
+      
+      <button type="button" class="theme-toggle" aria-label="Toggle color theme" title="Toggle color theme">
+  <svg class="theme-toggle__sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="4"></circle>
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+  </svg>
+  <svg class="theme-toggle__moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+  </svg>
+</button>
+
+    </nav>
+  </div>
+</header>
+
+
+    <div id="main-content" tabindex="-1">
+      
+  <main class="post">
+
+    <nav class="post-nav">
+      <a href="//localhost:58861/">← Dalto Curvelano</a>
+    </nav>
+
+    <div class="post-info">
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        3 minute read
+
+        
+      </p>
+    </div>
+
+    <article>
+      <h1 class="post-title">
+        <a href="//localhost:58861/posts/mcp-powered-error-tracking-in-rails/">MCP-Powered Error Tracking in Rails: Triage, Debugging and Profiling from Your Coding Agent</a>
+      </h1>
+
+      
+
+      
+
+      
+
+      <div class="post-content">
+        <p><img src="https://dlt.github.io/blog/images/demo.gif" alt="demo"></p>
+<p>&ldquo;Are there any recent errors in production?&rdquo;</p>
+<p>&ldquo;Let&rsquo;s triage the unresolved errors.&rdquo;</p>
+<p>&ldquo;Ignore all Stripe errors.&rdquo;</p>
+<p>&ldquo;Investigate error #13 and write a test that reproduces it.&rdquo;</p>
+<p>These are all prompts my coding agent understands when I work on projects that use <a href="https://github.com/dlt/faultline">Faultline</a>.</p>
+<p>A few months ago I wrote my own error tracking Rails engine. It all started when I felt the need to have better observability around errors and performance issues on a side project I was working on. I wanted something that had more or less the same capabilities as a tool like Sentry, i.e. getting notified whenever an error occurs in production and having enough context to investigate the root cause and provide a fix. But I also wanted something simple, Rails only, and integrated into any Rails application. Something that would be enough for my side projects, would give me the power to change it whenever I wanted, and would save me the hassle or the costs of installing a trial version of Sentry or other similar tools.</p>
+<p>It has the basics of what you would expect from an error tracking engine. You can see graphs with the history of exceptions, you can dig into some exception details and see what the cause was, you can see the stack trace and inspect variables at raise point.</p>
+<p>Notifications go out via Slack, Telegram, Discord, or email. No setup required on a Rails app. GitHub integration means one click opens an issue from any tracked exception. An APM module rounds it out: average time spent in ms, number of queries executed against the database, and flame graphs for the slowest parts of the codebase. All of which are table-stakes. Sentry has been doing it for decades.</p>
+<p>What sets it apart is that this gem also includes an MCP server and Claude Code plugin. Now, if I want to triage bugs or check how the application is performing, I can just write to my coding agent instead of logging into the application, avoiding tedious copy-pasting and context-switching. Before this feature, I used to go into the application error dashboard and copy the stack traces and error messages into the coding agent.</p>
+<p>To use it you need to generate a security token to authenticate requests to the MCP server, and install the Claude Code plugin. The plugin has skills that allow you to list errors, get more information regarding a specific exception, or perform destructive actions on the server, like updating, resolving, changing statuses, or even creating GitHub issues.
+Check the <a href="https://github.com/dlt/faultline#mcp-model-context-protocol">README</a> for a full list of capabilities.</p>
+<p>The tool for debugging a specific exception is useful because it pulls the full exception and stack trace from the server. And since I&rsquo;m already inside the project directory, the coding agent can immediately relate the stack trace to the current codebase and propose a fix.</p>
+<p>Using the MCP server from the coding agent is great, but you don&rsquo;t need to limit yourself to just this use case. I&rsquo;ve provided the MCP URL and authentication token to my Hermes agent and asked it to provide me with daily reports regarding my production bugs and application performance. The next logical step is to have it open PR drafts with solutions for any new issues that arise.</p>
+<p><img src="https://dlt.github.io/blog/images/hermes-telegram.jpg" alt="hermes telegram"></p>
+<p>If you try it out, open an issue or let me know how it goes. So far I&rsquo;ve only run it on my own side projects, so I&rsquo;m curious to see how the debug flow performs on something bigger.</p>
+
+      </div>
+    </article>
+
+    <hr />
+
+    <div class="post-info">
+      
+
+      
+
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        581 words
+      </p>
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        
+          2026-05-15 12:00
+        
+
+        
+          
+            
+              (Updated: 2026-05-23 13:30)
+            
+          
+        
+      </p>
+        <p>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit">
+            <circle cx="12" cy="12" r="4"></circle>
+            <line x1="1.05" y1="12" x2="7" y2="12"></line>
+            <line x1="17.01" y1="12" x2="22.96" y2="12"></line>
+          </svg>
+
+          <a href="https://github.com/dlt/blog/commit/87ff6938600a88a611f646acd43115b2b406a39d" target="_blank" rel="noopener">87ff693</a>
+          @ 2026-05-23
+        </p>
+    </div>
+
+    
+  <nav class="post-pager" aria-label="More posts">
+    
+      <a class="post-pager__item post-pager__item--prev" href="//localhost:58861/posts/pg-glimpse-postgres-monitoring-tui/" rel="prev">
+        <span class="post-pager__dir">&larr; Newer</span>
+        <span class="post-pager__title">Building pg_glimpse: A Postgres Monitoring TUI</span>
+      </a>
+    
+    
+      <a class="post-pager__item post-pager__item--next" href="//localhost:58861/posts/introducao-a-indices-postgresql/" rel="next">
+        <span class="post-pager__dir">Older &rarr;</span>
+        <span class="post-pager__title">Introdução a Índices do PostgreSQL</span>
+      </a>
+    
+  </nav>
+
+
+
+    
+
+    
+
+    
+
+  </main>
+
+    </div>
+
+    <footer class="site-footer">
+  <div class="wrap site-footer__inner">
+    <span class="site-footer__copy">&copy; 2026 Dalto Curvelano</span>
+    <span class="site-footer__links">
+      
+      <a href="https://github.com/dlt" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://linkedin.com/in/daltojr" target="_blank" rel="noopener">LinkedIn</a>
+    </span>
+  </div>
+</footer>
+
+
+    
+
+
+
+
+  
+  <script src="/js/bundle.min.8bf1bf71d0e422dbcffb07f498e85f882876058080332a052445f781c52a596441f7357188001a43c0f6f152afb6e6beeea42774c3e2c3708b8854feac5ccb78.js" integrity="sha512-i/G/cdDkItvP&#43;wf0mOhfiCh2BYCAMyoFJEX3gcUqWWRB9zVxiAAaQ8D28VKvtua&#43;7qQndMPiw3CLiFT&#43;rFzLeA==" defer></script>
+
+
+
+
+  </body>
+</html>

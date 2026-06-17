@@ -2,23 +2,29 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>//localhost:1313/</loc>
-    <lastmod>2026-01-27T14:21:48+04:00</lastmod>
+    <loc>//localhost:58861/posts/pg-glimpse-postgres-monitoring-tui/</loc>
+    <lastmod>2026-05-30T13:35:32+04:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/posts/introduction-to-postgresql-indexes/</loc>
-    <lastmod>2024-09-20T13:37:45+04:00</lastmod>
+    <loc>//localhost:58861/</loc>
+    <lastmod>2026-05-30T13:35:32+04:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/posts/introdu%C3%A7ao-a-indices-postgresql/</loc>
-    <lastmod>2024-09-11T12:07:51+04:00</lastmod>
+    <loc>//localhost:58861/posts/</loc>
+    <lastmod>2026-05-30T13:35:32+04:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/posts/</loc>
-    <lastmod>2024-09-20T13:37:45+04:00</lastmod>
+    <loc>//localhost:58861/posts/mcp-powered-error-tracking-in-rails/</loc>
+    <lastmod>2026-05-23T13:30:40+04:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/about/</loc>
-    <lastmod>2026-01-27T14:21:48+04:00</lastmod>
+    <loc>//localhost:58861/posts/introducao-a-indices-postgresql/</loc>
+    <lastmod>2026-02-01T14:13:40+04:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/categories/</loc>
+    <loc>//localhost:58861/posts/introduction-to-postgresql-indexes/</loc>
+    <lastmod>2026-04-23T20:54:02+04:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/</loc>
+    <loc>//localhost:58861/about/</loc>
+    <lastmod>2026-05-20T17:12:36+04:00</lastmod>
+  </url><url>
+    <loc>//localhost:58861/categories/</loc>
+  </url><url>
+    <loc>//localhost:58861/tags/</loc>
   </url>
 </urlset>
